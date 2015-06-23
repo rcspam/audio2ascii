@@ -4,6 +4,18 @@
 # sox must installed
 # yad must be installed for the GUI
 
+function usage() {
+	ud=$(basename "$0")
+	echo "Usage: $ud [-g] audio_file file.ascii dim Natron_project_fps lenght [multiplication_factor]"
+	echo "-g : start with GUI"
+	echo "Convert audio file (all supported by 'sox') in an ascii file support by Natron"
+	echo "'sox' must be installed"
+	echo "Only for GUI:'yad' must be installed"
+	exit
+}
+
+[[ "$1" == "-h" || "$1" == "--help" ]] && usage
+
 if ! which sox >/dev/null;then
 	echo "$0 require 'sox' which is not installed"
 	exit 1  
@@ -47,12 +59,7 @@ if [ $gui ];then
 	
 	rm "${YAD_TMP}"
 else
-	if [ -z $3 ] ;then
-		echo "Usage: $0 audio_file file.ascii dim Natron_project_fps lenght [multiplication_factor]"
-		echo "Convert audio file (all supported by 'sox') in an ascii file support by Natron"
-		echo "'sox' must be installed"
-		exit 1
-	fi
+	[[ -z $3 ]] && usage
 
 	in="${1}"
 	out="${2}"
