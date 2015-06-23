@@ -2,28 +2,74 @@
 
 # audio2ascii audio_file ascii_file dim Natron_project_fps length [multiplication_factor]
 # sox must installed
+# yad must be installed for the GUI
 
-if [ -z $3 ] ;then
-	echo "Usage: $0 audio_file file.ascii dim Natron_project_fps lenght [multiplication_factor]"
-	echo "Convert audio file (all supported by 'sox') in an ascii file support by Natron"
-	echo "'sox' must be installed"
-	exit 1
+if ! which sox >/dev/null;then
+	echo "$0 require 'sox' which is not installed"
+	exit 1  
 fi
 
-in="${1}"
-out="${2}"
-dim="${3}"
-fps="${4}"
-len="${5}"
-# multip. factor Default: 1000
-fact="${6:-1000}"
+if [ "$1" == "-g" ]; then
+	gui=1
+	shift
+	if ! which yad >/dev/null;then
+		echo "$0 require 'yad' which is not installed"
+		exit 1
+	fi
+else
+	gui=
+fi
+
+if [ $gui ];then
+	YAD_TMP=$(mktemp --tmpdir yad.XXXXXXXX)
+	yad	--center --on-top --title="Convert Audio to ascii"\
+		--form	--field="<b>Audio file </b> to convert \::FL"\
+				--field="<b>Ascii file </b> to create \::SFL"\
+				--field="<b>Dimension </b> (x\:1  x+y\:2)\:"\
+				--field="<b>Frames/sec </b> (of the Natron project)\:"\
+				--field="<b>Duration</b> (of the curve in secondes)\:"\
+				--field="<b>Multiplcator Factor</b> (default is 1000)\nSet the height of the curve:"\
+				"${1}"\
+				"${2}"\
+				"${3}"\
+				"${4}"\
+				"${5}"\
+				"${6:-1000}" > "${YAD_TMP}" 2>/dev/null 
+	[[ $? = 252 || $? = 1 ]] && rm "${YAD_TMP}" && exit 1
+	
+	cat "${YAD_TMP}"	
+	in="$(cut -d'|' -f1 < "${YAD_TMP}")"
+	out="$(cut -d'|' -f2 < "${YAD_TMP}")"
+	dim="$(cut -d'|' -f3 < "${YAD_TMP}")"
+	fps="$(cut -d'|' -f4 < "${YAD_TMP}")"
+	len="$(cut -d'|' -f5 < "${YAD_TMP}")"
+	fact="$(cut -d'|' -f6 < "${YAD_TMP}")"
+	
+	rm "${YAD_TMP}"
+else
+	if [ -z $3 ] ;then
+		echo "Usage: $0 audio_file file.ascii dim Natron_project_fps lenght [multiplication_factor]"
+		echo "Convert audio file (all supported by 'sox') in an ascii file support by Natron"
+		echo "'sox' must be installed"
+		exit 1
+	fi
+
+	in="${1}"
+	out="${2}"
+	dim="${3}"
+	fps="${4}"
+	len="${5}"
+	# multip. factor Default: 1000
+	fact="${6:-1000}"
+fi
+
 data="${PWD}/data_$$_tmp.dat"
 
 # convert audio to .dat 
 srate=$(sox --i "${in}" | grep "^Sample Rate" | awk '{print $4}')
 echo -n "Converting $in to Data file with SampleRate $fps (original: $srate)..."
 echo sox "${in}" -r ${fps} "${data}" trim 0 ${len} 
-sox "${in}" -r ${fps} "${data}" trim 0 ${len} || exit 1
+sox "${in}" -r ${fps} "${data}" trim 0 ${len}|| exit 1
 echo "Done"
 
 # convert .dat to ascii
@@ -46,4 +92,4 @@ else
 	exit 1
 fi
 echo "Done"
-rm ${data}
+rm ${data} 
