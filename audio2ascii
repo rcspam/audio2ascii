@@ -15,8 +15,8 @@ function usage() {
 }
 
 function error() {
-	[[ $gui ]] && yad --center --on-top --geometry="400x120" --image="error" --text="\n\t<b>Sox Error:</b>\n\n\n\t$(cat ${error_log})" 2> /dev/null &
 	echo -e "\n$(cat ${error_log})"
+	[[ $gui ]] && yad --center --on-top --geometry="400x120" --image="error" --text="\n\t<b>Sox Error:</b>\n\n\n\t$(cat ${error_log})" 2> /dev/null &
 	sleep 1 # let time to read ${error_log}
 	rm ${error_log}
 	exit $1
@@ -45,13 +45,13 @@ if [ $gui ];then
 	yad	--center --on-top --title="Convert Audio to ascii"\
 		--form	--field="<b>Audio file </b> to convert \::FL"\
 				--field="<b>Ascii file </b> to create \::SFL"\
-				--field="<b>Dimension </b> (x\:1  x+y\:2)\:"\
+				--field="<b>Dimensions </b> (on 1 axe\: x or on 2 axes\:xy)\:CB"\
 				--field="<b>Frames/sec </b> (of the Natron project)\:"\
 				--field="<b>Duration</b> (of the curve in secondes)\:"\
 				--field="<b>Multiplcator Factor</b> (default is 1000)\nSet the height of the curve:"\
 				"${1}"\
-				"${2}"\
-				"${3:-1}"\
+				"${2:-"${HOME}/Desktop/curve.ascii"}"\
+				"x!xy"\
 				"${4:-24}"\
 				"${5:-10}"\
 				"${6:-1000}" > "${YAD_TMP}" 2>/dev/null 
@@ -77,7 +77,7 @@ else
 	fact="${6:-1000}"
 fi
 
-data="${PWD}/data_$$_tmp.dat"
+data="/tmp/data_$$_tmp.dat"
 error_log="/tmp/error_log_sox_$$"
 
 # convert audio to .dat 
@@ -88,7 +88,9 @@ sox "${in}" -r ${fps} "${data}" trim 0 ${len} 2>${error_log} || error 1
 echo "Done"
 
 # convert .dat to ascii
+max=0
 echo -n "Converting Data file to $out..."
+<<<<<<< HEAD
 if [ $dim -le 2 ];then
 	while read line
 	do
@@ -107,3 +109,44 @@ else
 fi
 echo "Done"
 rm "${data}" 
+=======
+while read line
+do
+	if [ "$dim" == "x" ];then
+		# x
+		read dimx max <<< $( echo $line | grep -v ";" | sed 's/ [[:blank:]]//g;s/[[:space:]]/ /g' |\
+						awk -v fact="$fact" -v max="$max"\
+							'
+							{printf "%.10f\n", ($2*fact)}\
+							{if ($2 < 0) $2 = -$2}\
+							{if (($2*fact) > max) max = ($2*fact)}\
+							{print max}\
+							')
+		echo $dimx $max
+	else
+		# xy
+		read dimxy max <<< $( echo $line | grep -v ";" | sed 's/ [[:blank:]]//g;s/[[:space:]]/ /g' |\
+						awk -v fact="$fact" -v max="$max"\
+						'
+						{printf "%.10f_%.10f\n", $2*fact, $3*fact}\
+						{if ($2 < 0) $2 = -$2}\
+						{if ($3 < 0) $3 = -$3}\
+						{if ($3 > $2)  $2 = $3}\
+						{if (($2*fact) > max) max = ($2*fact)}\
+						{print max}\
+						')
+		echo $dimxy $max
+	fi
+done < "${data}" > "${out}"
+echo "Done"
+echo The maximum varation is $max
+[[ gui ]] && { 
+				yad --center --on-top --geometry="400x120" --image="info" --text="\n\n\n\t\tThe maximum varation is <b>$max</b>"\
+					--button="Change some parameters:2"\
+					--button="Ok:0" 2> /dev/null
+				ret=$?
+				[[ $ret == 2 ]] && "${0}" -g "${in}" "${out}" "${dim}" "${fps}" "${len}" "${fact}"
+			 }
+			 
+rm "${data}"
+>>>>>>> trunk
