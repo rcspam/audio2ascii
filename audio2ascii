@@ -22,6 +22,30 @@ function error() {
 	exit $1
 }
 
+function awkx() {
+	echo $line | grep -v ";" | sed 's/ [[:blank:]]//g;s/[[:space:]]/ /g' |\
+		awk -v fact="$fact" -v max="$max"\
+			'
+			{printf "%.10f\n", ($2*fact)}\
+			{if ($2 < 0) $2 = -$2}\
+			{if (($2*fact) > max) max = ($2*fact)}\
+			{print max}\
+			'
+}
+
+function awkxy() {
+	echo $line | grep -v ";" | sed 's/ [[:blank:]]//g;s/[[:space:]]/ /g' |\
+		awk -v fact="$fact" -v max="$max"\
+			'
+			{printf "%.10f_%.10f\n", $2*fact, $3*fact}\
+			{if ($2 < 0) $2 = -$2}\
+			{if ($3 < 0) $3 = -$3}\
+			{if ($3 > $2)  $2 = $3}\
+			{if (($2*fact) > max) max = ($2*fact)}\
+			{print max}\
+			'
+}
+
 [[ "$1" == "-h" || "$1" == "--help" ]] && usage
 
 if ! which sox >/dev/null;then
@@ -82,7 +106,7 @@ error_log="/tmp/error_log_sox_$$"
 
 # convert audio to .dat 
 srate=$(sox --i "${in}" 2>${error_log} | grep "^Sample Rate" | awk '{print $4}')
-echo CMD: sox "${in}" -r ${fps} "${data}" trim 0 ${len}
+echo CMD: sox "${in}" -r ${fps} "${data}" vol 0 trim 0 ${len}
 echo -n "Converting $in to Data file with SampleRate $fps (original: $srate)..."
 sox "${in}" -r ${fps} "${data}" trim 0 ${len} 2>${error_log} || error 1
 echo "Done"
@@ -94,36 +118,21 @@ while read line
 do
 	if [ "$dim" == "x" ];then
 		# x
-		read dimx max <<< $( echo $line | grep -v ";" | sed 's/ [[:blank:]]//g;s/[[:space:]]/ /g' |\
-						awk -v fact="$fact" -v max="$max"\
-							'
-							{printf "%.10f\n", ($2*fact)}\
-							{if ($2 < 0) $2 = -$2}\
-							{if (($2*fact) > max) max = ($2*fact)}\
-							{print max}\
-							')
-		echo $dimx $max
+		read dimx max <<< $(awkx)
+		echo $dimx
 	else
 		# xy
-		read dimxy max <<< $( echo $line | grep -v ";" | sed 's/ [[:blank:]]//g;s/[[:space:]]/ /g' |\
-						awk -v fact="$fact" -v max="$max"\
-						'
-						{printf "%.10f_%.10f\n", $2*fact, $3*fact}\
-						{if ($2 < 0) $2 = -$2}\
-						{if ($3 < 0) $3 = -$3}\
-						{if ($3 > $2)  $2 = $3}\
-						{if (($2*fact) > max) max = ($2*fact)}\
-						{print max}\
-						')
-		echo $dimxy $max
+		read dimxy max <<< $(awkxy)
+		echo $dimxy
 	fi
 done < "${data}" > "${out}"
 echo "Done"
 echo The maximum varation is $max
 [[ gui ]] && { 
-				yad --center --on-top --geometry="400x120" --image="info" --text="\n\n\n\t\tThe maximum varation is <b>$max</b>"\
+				yad --center --on-top --geometry="400x500" --image="info" --text-info --text="\n\t\tThe maximum varation is <b>$max</b>\n"\
+					--tail  --listen \
 					--button="Change some parameters:2"\
-					--button="Ok:0" 2> /dev/null
+					--button="Ok:0" 2> /dev/null < "${out}"
 				ret=$?
 				[[ $ret == 2 ]] && "${0}" -g "${in}" "${out}" "${dim}" "${fps}" "${len}" "${fact}"
 			 }
