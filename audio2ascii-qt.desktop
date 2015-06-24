@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Name=audio2ascii-qt
+GenericName=Audio Curve Generator (Qt)
+Comment=Create curve data from audio
+Exec=audio2ascii-qt
+Icon=audio2ascii
+Terminal=false
+Type=Application
+StartupNotify=false
+Categories=Multimedia;Audio;
+X-Desktop-File-Install-Version=0.21

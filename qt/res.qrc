@@ -4,10 +4,10 @@
         <file>gfx/duration.png</file>
         <file>gfx/factor.png</file>
         <file>gfx/fps.png</file>
-        <file>gfx/logo.png</file>
         <file>gfx/open.png</file>
         <file>gfx/quit.png</file>
         <file>gfx/refresh.png</file>
         <file>gfx/save.png</file>
+        <file>gfx/audio2ascii.png</file>
     </qresource>
 </RCC>

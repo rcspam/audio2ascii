@@ -5,7 +5,7 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     QCoreApplication::setApplicationName("audio2ascii");
-    QCoreApplication::setApplicationVersion("1.0alpha1");
+    QCoreApplication::setApplicationVersion(A2A_VERSION);
     a2a w;
     w.show();
 

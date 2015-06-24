@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Name=audio2ascii-yad
+GenericName=Audio Curve Generator (YAD)
+Comment=Create curve data from audio
+Exec=audio2ascii.sh -g
+Icon=audio2ascii
+Terminal=false
+Type=Application
+StartupNotify=false
+Categories=Multimedia;Audio;
+X-Desktop-File-Install-Version=0.21
