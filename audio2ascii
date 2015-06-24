@@ -14,6 +14,14 @@ function usage() {
 	exit
 }
 
+function error() {
+	[[ $gui ]] && yad --center --on-top --geometry="400x120" --image="error" --text="\n\t<b>Sox Error:</b>\n\n\n\t$(cat ${error_log})" 2> /dev/null &
+	echo -e "\n$(cat ${error_log})"
+	sleep 1 # let time to read ${error_log}
+	rm ${error_log}
+	exit $1
+}
+
 [[ "$1" == "-h" || "$1" == "--help" ]] && usage
 
 if ! which sox >/dev/null;then
@@ -43,13 +51,12 @@ if [ $gui ];then
 				--field="<b>Multiplcator Factor</b> (default is 1000)\nSet the height of the curve:"\
 				"${1}"\
 				"${2}"\
-				"${3}"\
-				"${4}"\
-				"${5}"\
+				"${3:-1}"\
+				"${4:-24}"\
+				"${5:-10}"\
 				"${6:-1000}" > "${YAD_TMP}" 2>/dev/null 
 	[[ $? = 252 || $? = 1 ]] && rm "${YAD_TMP}" && exit 1
 	
-	cat "${YAD_TMP}"	
 	in="$(cut -d'|' -f1 < "${YAD_TMP}")"
 	out="$(cut -d'|' -f2 < "${YAD_TMP}")"
 	dim="$(cut -d'|' -f3 < "${YAD_TMP}")"
@@ -71,12 +78,13 @@ else
 fi
 
 data="${PWD}/data_$$_tmp.dat"
+error_log="/tmp/error_log_sox_$$"
 
 # convert audio to .dat 
-srate=$(sox --i "${in}" | grep "^Sample Rate" | awk '{print $4}')
+srate=$(sox --i "${in}" 2>${error_log} | grep "^Sample Rate" | awk '{print $4}')
+echo CMD: sox "${in}" -r ${fps} "${data}" trim 0 ${len}
 echo -n "Converting $in to Data file with SampleRate $fps (original: $srate)..."
-echo sox "${in}" -r ${fps} "${data}" trim 0 ${len} 
-sox "${in}" -r ${fps} "${data}" trim 0 ${len}|| exit 1
+sox "${in}" -r ${fps} "${data}" trim 0 ${len} 2>${error_log} || error 1
 echo "Done"
 
 # convert .dat to ascii
@@ -90,7 +98,6 @@ if [ $dim -le 2 ];then
 		else
 			# xy
 			echo $line | grep -v ";" | sed 's/ [[:blank:]]//g;s/[[:space:]]/ /g' | awk -v fact="$fact" '{printf "%.10f_%.10f\n", $2*fact, $3*fact}'
-
 		fi
 	done < "${data}" > "${out}"
 else
