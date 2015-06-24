@@ -90,26 +90,6 @@ echo "Done"
 # convert .dat to ascii
 max=0
 echo -n "Converting Data file to $out..."
-<<<<<<< HEAD
-if [ $dim -le 2 ];then
-	while read line
-	do
-		if [ $dim == 1 ];then
-			# x
-			echo $line | grep -v ";" | sed 's/ [[:blank:]]//g;s/[[:space:]]/ /g' | awk -v fact="$fact" '{printf "%.10f\n", $2*fact}'
-		else
-			# xy
-			echo $line | grep -v ";" | sed 's/ [[:blank:]]//g;s/[[:space:]]/ /g' | awk -v fact="$fact" '{printf "%.10f_%.10f\n", $2*fact, $3*fact}'
-		fi
-	done < "${data}" > "${out}"
-else
-	echo "  Error dim =$dim :  must 1 or 2"
-	rm "${data}"
-	exit 1
-fi
-echo "Done"
-rm "${data}" 
-=======
 while read line
 do
 	if [ "$dim" == "x" ];then
@@ -122,7 +102,7 @@ do
 							{if (($2*fact) > max) max = ($2*fact)}\
 							{print max}\
 							')
-		echo $dimx $max
+		echo $dimx
 	else
 		# xy
 		read dimxy max <<< $( echo $line | grep -v ";" | sed 's/ [[:blank:]]//g;s/[[:space:]]/ /g' |\
@@ -135,7 +115,7 @@ do
 						{if (($2*fact) > max) max = ($2*fact)}\
 						{print max}\
 						')
-		echo $dimxy $max
+		echo $dimxy
 	fi
 done < "${data}" > "${out}"
 echo "Done"
@@ -149,4 +129,3 @@ echo The maximum varation is $max
 			 }
 			 
 rm "${data}"
->>>>>>> trunk
