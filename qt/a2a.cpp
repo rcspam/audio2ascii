@@ -24,7 +24,7 @@ a2a::~a2a()
 
 void a2a::on_actionAboutApp_triggered()
 {
-    QMessageBox::about(this,"About "+qApp->applicationName(),"<h3>"+qApp->applicationName()+"</h3><p>Audio curve generator for Natron/Nuke.</p><p>Written by <a href=\"https://github.com/rcspam\">rcspam</a> and <a href=\"https://github.com/olear\">olear</a>.</p>"+audio.about()+"<p>Visit <a href=\"https://github.com/rcspam/"+qApp->applicationName()+"\">"+qApp->applicationName()+"</a> online for more information and updates.</p>");
+    QMessageBox::about(this,"About "+qApp->applicationName(),"<h3>"+qApp->applicationName()+" "+qApp->applicationVersion()+"</h3><p>Audio curve generator for Natron/Nuke.</p><p>Written by <a href=\"https://github.com/rcspam\">rcspam</a> and <a href=\"https://github.com/olear\">olear</a>.</p>"+audio.about()+"<p>Visit <a href=\"https://github.com/rcspam/"+qApp->applicationName()+"\">"+qApp->applicationName()+"</a> online for more information and updates.</p>");
 }
 
 void a2a::on_actionAboutQt_triggered()

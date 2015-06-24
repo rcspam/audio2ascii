@@ -13,10 +13,30 @@
   <property name="windowTitle">
    <string>a2a</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="res.qrc">
+    <normaloff>:/res/gfx/logo.png</normaloff>:/res/gfx/logo.png</iconset>
+  </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_dimension">
+      <item>
+       <widget class="QLabel" name="label">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="pixmap">
+         <pixmap resource="res.qrc">:/res/gfx/dimension.png</pixmap>
+        </property>
+       </widget>
+      </item>
       <item>
        <widget class="QLabel" name="label_dimension">
         <property name="sizePolicy">
@@ -51,6 +71,22 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_fps">
       <item>
+       <widget class="QLabel" name="label_2">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="pixmap">
+         <pixmap resource="res.qrc">:/res/gfx/fps.png</pixmap>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QLabel" name="label_fps">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
@@ -65,7 +101,7 @@
          </size>
         </property>
         <property name="text">
-         <string>Fps</string>
+         <string>FPS</string>
         </property>
        </widget>
       </item>
@@ -80,6 +116,22 @@
     </item>
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_duration">
+      <item>
+       <widget class="QLabel" name="label_3">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="pixmap">
+         <pixmap resource="res.qrc">:/res/gfx/duration.png</pixmap>
+        </property>
+       </widget>
+      </item>
       <item>
        <widget class="QLabel" name="label_duration">
         <property name="sizePolicy">
@@ -110,6 +162,22 @@
     </item>
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_factor">
+      <item>
+       <widget class="QLabel" name="label_4">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="pixmap">
+         <pixmap resource="res.qrc">:/res/gfx/factor.png</pixmap>
+        </property>
+       </widget>
+      </item>
       <item>
        <widget class="QLabel" name="label_factor">
         <property name="sizePolicy">
@@ -148,6 +216,10 @@
       </property>
       <property name="text">
        <string>Refresh</string>
+      </property>
+      <property name="icon">
+       <iconset resource="res.qrc">
+        <normaloff>:/res/gfx/refresh.png</normaloff>:/res/gfx/refresh.png</iconset>
       </property>
      </widget>
     </item>
@@ -189,6 +261,9 @@
    <addaction name="menuAbout"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
+   <property name="toolButtonStyle">
+    <enum>Qt::ToolButtonFollowStyle</enum>
+   </property>
    <attribute name="toolBarArea">
     <enum>TopToolBarArea</enum>
    </attribute>
@@ -200,6 +275,10 @@
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionOpen">
+   <property name="icon">
+    <iconset resource="res.qrc">
+     <normaloff>:/res/gfx/open.png</normaloff>:/res/gfx/open.png</iconset>
+   </property>
    <property name="text">
     <string>Open</string>
    </property>
@@ -211,6 +290,10 @@
    </property>
   </action>
   <action name="actionSave">
+   <property name="icon">
+    <iconset resource="res.qrc">
+     <normaloff>:/res/gfx/save.png</normaloff>:/res/gfx/save.png</iconset>
+   </property>
    <property name="text">
     <string>Save</string>
    </property>
@@ -222,6 +305,10 @@
    </property>
   </action>
   <action name="actionQuit">
+   <property name="icon">
+    <iconset resource="res.qrc">
+     <normaloff>:/res/gfx/quit.png</normaloff>:/res/gfx/quit.png</iconset>
+   </property>
    <property name="text">
     <string>Quit</string>
    </property>
@@ -244,6 +331,8 @@
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources/>
+ <resources>
+  <include location="res.qrc"/>
+ </resources>
  <connections/>
 </ui>
