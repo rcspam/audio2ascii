@@ -107,7 +107,7 @@ void a2a::getData()
     if (!active.isEmpty()) {
         QString result = audio.dat(active,ui->spinBox_fps->value(),ui->spinBox_duration->value(),ui->spinBox_factor->value(),ui->spinBox_dimension->value());
         if (!result.isEmpty()) {
-            ui->output->setPlainText("; "+qApp->applicationName()+" https://github.com/rcspam/audio2ascii\n; "+active+"\n"+result);
+            ui->output->setPlainText(result);
             ui->actionSave->setEnabled(true);
             ui->output->setEnabled(true);
         }

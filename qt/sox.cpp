@@ -94,10 +94,30 @@ QString Sox::dat(QString filename, int fps, int duration, int factor, int dimens
     }
 
     if (!curves.isEmpty()) {
-        //TODO make compat with natron/nuke
-        result = curves;
+        QString dat;
+        QStringList lines = curves.split("\n", QString::SkipEmptyParts);
+        dat.append("; "+qApp->applicationName()+" https://github.com/rcspam/audio2ascii\n; "+filename+"\n\n");
+        foreach(QString line, lines) {
+            if (!line.startsWith(";")) {
+                QStringList cordinates = line.simplified().split(" ");
+                int posMax=3;
+                int posCurr=0;
+                foreach(QString pos, cordinates) {
+                    if (posCurr<posMax)
+                    if (posCurr==1) {
+                        dat.append(QString::number(pos.toDouble()*factor,'f',10));
+                        if (dimension==1)
+                            dat.append("\n");
+                    }
+                    if (posCurr==2 && dimension==2)
+                        dat.append("_"+QString::number(pos.toDouble()*factor,'f',10)+"\n");
+                    posCurr++;
+                }
+            }
+        }
+        result = dat;
     }
-    else
+    if (result.isEmpty())
         emit error(tr("No data collected"));
 
     return result;
