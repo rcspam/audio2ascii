@@ -1,15 +1,142 @@
 #include "a2a.h"
 #include "ui_a2a.h"
+#include <QMessageBox>
+#include <QFileDialog>
+#include <QDir>
 
 a2a::a2a(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::a2a)
 {
     ui->setupUi(this);
-    setWindowTitle(qApp->applicationName()+" "+qApp->applicationVersion());
+    resetParams();
+    connect(&audio,SIGNAL(error(QString)),this,SLOT(errorHandler(QString)));
+    connect(&audio,SIGNAL(status(QString)),this,SLOT(statusHandler(QString)));
 }
 
 a2a::~a2a()
 {
     delete ui;
+}
+
+void a2a::on_actionAboutApp_triggered()
+{
+    QMessageBox::about(this,"About "+qApp->applicationName(),"<h3>"+qApp->applicationName()+"</h3><p>Audio curve generator for Natron/Nuke.</p><p>Written by <a href=\"https://github.com/rcspam\">rcspam</a> and <a href=\"https://github.com/olear\">olear</a>.</p>"+audio.about()+"<p>Visit <a href=\"https://github.com/rcspam/"+qApp->applicationName()+"\">"+qApp->applicationName()+"</a> online for more information and updates.</p>");
+}
+
+void a2a::on_actionAboutQt_triggered()
+{
+    QMessageBox::aboutQt(this);
+}
+
+void a2a::on_actionOpen_triggered()
+{
+    if (!ui->reload->isHidden())
+        ui->reload->hide();
+    QString fileName = QFileDialog::getOpenFileName(this,tr("Open audio file"), QDir::homePath(), tr("Audio Files (*.wav *.mp3)"));
+    if (!fileName.isEmpty()) {
+        active = fileName;
+        getData();
+    }
+    else
+        ui->statusBar->showMessage(tr("No audio file selected"),5000);
+}
+
+void a2a::on_actionSave_triggered()
+{
+    if (!ui->reload->isHidden())
+        ui->reload->hide();
+    //TODO
+}
+
+void a2a::on_actionQuit_triggered()
+{
+    qApp->quit();
+}
+
+void a2a::resetParams()
+{
+    ui->spinBox_dimension->clear();
+    ui->spinBox_duration->clear();
+    ui->spinBox_factor->clear();
+    ui->spinBox_fps->clear();
+    ui->output->clear();
+    this->setWindowTitle(qApp->applicationName());
+    ui->spinBox_dimension->setValue(1);
+    ui->spinBox_factor->setValue(1000);
+    ui->spinBox_fps->setValue(24);
+    ui->spinBox_duration->setValue(60);
+    ui->actionSave->setEnabled(false);
+    active.clear();
+    ui->output->setFocus();
+    ui->reload->hide();
+}
+
+void a2a::getData()
+{
+    if (!ui->reload->isHidden())
+        ui->reload->hide();
+    if (!active.isEmpty()) {
+        QString result = audio.dat(active,ui->spinBox_fps->value(),ui->spinBox_duration->value(),ui->spinBox_factor->value(),ui->spinBox_dimension->value());
+        if (!result.isEmpty()) {
+            ui->output->setPlainText(+"; "+active+"\n"+result);
+            ui->actionSave->setEnabled(true);
+            ui->output->setEnabled(true);
+        }
+    }
+    else {
+        ui->statusBar->showMessage(tr("No result"),5000);
+        active.clear();
+        ui->output->clear();
+        ui->output->setEnabled(false);
+        ui->actionSave->setEnabled(false);
+    }
+}
+
+void a2a::errorHandler(QString error)
+{
+    if (!error.isEmpty())
+        QMessageBox::warning(this,tr("Warning"),error);
+}
+
+void a2a::statusHandler(QString status)
+{
+    if (!status.isEmpty())
+        ui->statusBar->showMessage(status,5000);
+}
+
+void a2a::on_reload_clicked()
+{
+    if (!ui->reload->isHidden() && !active.isEmpty()) {
+        ui->reload->hide();
+        getData();
+    }
+}
+
+void a2a::on_spinBox_duration_valueChanged(int arg1)
+{
+    Q_UNUSED(arg1)
+    if (ui->reload->isHidden() && !active.isEmpty())
+        ui->reload->show();
+}
+
+void a2a::on_spinBox_factor_valueChanged(int arg1)
+{
+    Q_UNUSED(arg1)
+    if (ui->reload->isHidden() && !active.isEmpty())
+        ui->reload->show();
+}
+
+void a2a::on_spinBox_fps_valueChanged(int arg1)
+{
+    Q_UNUSED(arg1)
+    if (ui->reload->isHidden() && !active.isEmpty())
+        ui->reload->show();
+}
+
+void a2a::on_spinBox_dimension_valueChanged(int arg1)
+{
+    Q_UNUSED(arg1)
+    if (ui->reload->isHidden() && !active.isEmpty())
+        ui->reload->show();
 }
