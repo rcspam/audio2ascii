@@ -39,6 +39,7 @@ private:
     Ui::a2a *ui;
     Sox audio;
     QString active;
+    QString lastDir;
 };
 
 #endif // A2A_H

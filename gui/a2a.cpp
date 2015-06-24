@@ -3,6 +3,9 @@
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QDir>
+#include <QFile>
+#include <QFileDialog>
+#include <QTextStream>
 
 a2a::a2a(QWidget *parent) :
     QMainWindow(parent),
@@ -33,9 +36,16 @@ void a2a::on_actionOpen_triggered()
 {
     if (!ui->reload->isHidden())
         ui->reload->hide();
-    QString fileName = QFileDialog::getOpenFileName(this,tr("Open audio file"), QDir::homePath(), tr("Audio Files (*.wav *.mp3)"));
+    QString openDir;
+    if (!lastDir.isEmpty())
+        openDir = lastDir;
+    else
+        openDir = QDir::homePath();
+    QString fileName = QFileDialog::getOpenFileName(this,tr("Open audio file"), openDir, tr("Audio Files (*.wav)"));
     if (!fileName.isEmpty()) {
         active = fileName;
+        QFileInfo file(fileName);
+        lastDir = file.absoluteFilePath();
         getData();
     }
     else
@@ -46,7 +56,25 @@ void a2a::on_actionSave_triggered()
 {
     if (!ui->reload->isHidden())
         ui->reload->hide();
-    //TODO
+    if (!ui->output->toPlainText().isEmpty()) {
+        QString fileName = QFileDialog::getSaveFileName(this,tr("Save text file"), lastDir, tr("Text File (*.txt)"));
+        if (!fileName.isEmpty()) {
+            QFile output(fileName);
+            if (output.open(QIODevice::WriteOnly|QIODevice::Text)) {
+                QTextStream stream(&output);
+                stream << ui->output->toPlainText();
+                output.close();
+            }
+            if (output.exists()) {
+                ui->statusBar->showMessage(tr("Text file saved"),5000);
+                ui->actionSave->setEnabled(false);
+            }
+            else
+                ui->statusBar->showMessage(tr("Failed to save text file"),5000);
+        }
+    }
+    else
+        ui->statusBar->showMessage(tr("Nothing to save"),5000);
 }
 
 void a2a::on_actionQuit_triggered()
@@ -79,7 +107,7 @@ void a2a::getData()
     if (!active.isEmpty()) {
         QString result = audio.dat(active,ui->spinBox_fps->value(),ui->spinBox_duration->value(),ui->spinBox_factor->value(),ui->spinBox_dimension->value());
         if (!result.isEmpty()) {
-            ui->output->setPlainText(+"; "+active+"\n"+result);
+            ui->output->setPlainText("; "+qApp->applicationName()+" https://github.com/rcspam/audio2ascii\n; "+active+"\n"+result);
             ui->actionSave->setEnabled(true);
             ui->output->setEnabled(true);
         }
