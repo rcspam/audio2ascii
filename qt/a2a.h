@@ -28,12 +28,11 @@ private slots:
     void statusHandler(QString status);
     void on_reload_clicked();
     void on_spinBox_duration_valueChanged(int arg1);
-
     void on_spinBox_factor_valueChanged(int arg1);
-
     void on_spinBox_fps_valueChanged(int arg1);
-
     void on_spinBox_dimension_valueChanged(int arg1);
+    void loadConf();
+    void saveConf();
 
 private:
     Ui::a2a *ui;

@@ -6,6 +6,8 @@
 #include <QFile>
 #include <QFileDialog>
 #include <QTextStream>
+#include <QSettings>
+#include <QTimer>
 
 a2a::a2a(QWidget *parent) :
     QMainWindow(parent),
@@ -15,11 +17,50 @@ a2a::a2a(QWidget *parent) :
     resetParams();
     connect(&audio,SIGNAL(error(QString)),this,SLOT(errorHandler(QString)));
     connect(&audio,SIGNAL(status(QString)),this,SLOT(statusHandler(QString)));
+    QTimer::singleShot(0,this,SLOT(loadConf()));
 }
 
 a2a::~a2a()
 {
+    saveConf();
     delete ui;
+}
+
+void a2a::loadConf()
+{
+    QSettings settings;
+    settings.beginGroup("ui");
+    if (settings.value("state").isValid())
+        this->restoreState(settings.value("state").toByteArray());
+    if (settings.value("size").isValid())
+        this->resize(settings.value("size",QSize(320,256)).toSize());
+    if (settings.value("pos").isValid())
+        this->move(settings.value("pos",QPoint(0,0)).toPoint());
+    if (settings.value("max").toBool() == true)
+        this->showMaximized();
+    settings.endGroup();
+    settings.beginGroup("file");
+    if (!settings.value("lastDir").isNull())
+        lastDir = settings.value("lastDir").toString();
+    settings.endGroup();
+}
+
+void a2a::saveConf()
+{
+    QSettings settings;
+    settings.beginGroup("ui");
+    settings.setValue( "state",this->saveState());
+    settings.setValue("size",this->size());
+    settings.setValue("pos",this->pos());
+    if (this->isMaximized())
+        settings.setValue("max","true");
+    else
+        settings.setValue("max","false");
+    settings.endGroup();
+    settings.beginGroup("file");
+    if (!lastDir.isEmpty())
+        settings.setValue("lastDir",lastDir);
+    settings.endGroup();
 }
 
 void a2a::on_actionAboutApp_triggered()
@@ -104,11 +145,15 @@ void a2a::getData()
 {
     if (!ui->reload->isHidden())
         ui->reload->hide();
+    ui->actionSave->setDisabled(true);
+    ui->actionOpen->setDisabled(true);
     if (!active.isEmpty()) {
+        qApp->processEvents();
         QString result = audio.dat(active,ui->spinBox_fps->value(),ui->spinBox_duration->value(),ui->spinBox_factor->value(),ui->spinBox_dimension->value());
         if (!result.isEmpty()) {
             ui->output->setPlainText(result);
             ui->actionSave->setEnabled(true);
+            ui->actionOpen->setEnabled(true);
             ui->output->setEnabled(true);
         }
     }
@@ -118,6 +163,7 @@ void a2a::getData()
         ui->output->clear();
         ui->output->setEnabled(false);
         ui->actionSave->setEnabled(false);
+        ui->actionSave->setEnabled(true);
     }
 }
 

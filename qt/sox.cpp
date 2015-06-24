@@ -41,6 +41,7 @@ QString Sox::about()
 
 QString Sox::dat(QString filename, int fps, int duration, int factor, int dimension)
 {
+    emit status(tr("Generating data ..."));
     QString result;
     QString data = QDir::tempPath()+QDir::separator()+qApp->applicationName()+".dat";
     QString curves;
@@ -91,6 +92,8 @@ QString Sox::dat(QString filename, int fps, int duration, int factor, int dimens
     }
     if (result.isEmpty())
         emit error(tr("No data collected"));
+    else
+        emit status(tr("Done"));
 
     return result;
 }
