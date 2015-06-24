@@ -2,7 +2,7 @@ QT       += core gui
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = audio2ascii-qt
-VERSION = 1.0alpha1
+VERSION = 1.0beta1
 TEMPLATE = app
 
 SOURCES += qt/main.cpp qt/a2a.cpp qt/sox.cpp
