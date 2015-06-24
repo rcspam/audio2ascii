@@ -89,8 +89,6 @@ void a2a::on_actionOpen_triggered()
         lastDir = file.absolutePath();
         getData();
     }
-    else
-        ui->statusBar->showMessage(tr("No audio file selected"),5000);
 }
 
 void a2a::on_actionSave_triggered()
