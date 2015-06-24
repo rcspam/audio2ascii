@@ -16,7 +16,7 @@ signals:
 public slots:
     QString bin();
     QString about();
-    QString dat(QString filename, int fps, int duration, int factor, int dimension);
+    QString dat(QString filename, int fps, int duration, int factor, bool x, bool y);
 };
 
 #endif // SOX_H

@@ -39,7 +39,7 @@ QString Sox::about()
     return desc;
 }
 
-QString Sox::dat(QString filename, int fps, int duration, int factor, int dimension)
+QString Sox::dat(QString filename, int fps, int duration, int factor, bool x, bool y)
 {
     emit status(tr("Generating data ..."));
     QString result;
@@ -73,17 +73,18 @@ QString Sox::dat(QString filename, int fps, int duration, int factor, int dimens
         foreach(QString line, lines) {
             if (!line.startsWith(";")) {
                 QStringList cordinates = line.simplified().split(" ");
-                int posMax=3;
                 int posCurr=0;
                 foreach(QString pos, cordinates) {
-                    if (posCurr<posMax)
-                    if (posCurr==1) {
+                    if (posCurr==1 && x) {
                         dat.append(QString::number(pos.toDouble()*factor,'f',10));
-                        if (dimension==1)
+                        if (!y)
                             dat.append("\n");
                     }
-                    if (posCurr==2 && dimension==2)
-                        dat.append("_"+QString::number(pos.toDouble()*factor,'f',10)+"\n");
+                    if (posCurr==2 && y) {
+                        if (x)
+                            dat.append("_");
+                        dat.append(QString::number(pos.toDouble()*factor,'f',10)+"\n");
+                    }
                     posCurr++;
                 }
             }

@@ -65,7 +65,7 @@ void a2a::saveConf()
 
 void a2a::on_actionAboutApp_triggered()
 {
-    QMessageBox::about(this,"About "+qApp->applicationName(),"<h3>"+qApp->applicationName()+" "+qApp->applicationVersion()+"</h3><p>Audio curve generator for Natron/Nuke.</p><p>Written by <a href=\"https://github.com/rcspam\">rcspam</a> and <a href=\"https://github.com/olear\">olear</a>.</p>"+audio.about()+"<p>Visit <a href=\"https://github.com/rcspam/"+qApp->applicationName()+"\">"+qApp->applicationName()+"</a> online for more information and updates.</p>");
+    QMessageBox::about(this,"About "+qApp->applicationName(),"<h3>"+qApp->applicationName()+" "+qApp->applicationVersion()+"</h3><p>Audio curve generator for Natron/Nuke.</p><p>Written by <a href=\"https://github.com/rcspam\">rcspam</a> and <a href=\"https://github.com/olear\">olear</a>.</p>"+audio.about()+"<p>Visit <a href=\"https://github.com/rcspam/"+qApp->applicationName()+"\">github.com</a> for more information and updates.</p>");
 }
 
 void a2a::on_actionAboutQt_triggered()
@@ -123,13 +123,13 @@ void a2a::on_actionQuit_triggered()
 
 void a2a::resetParams()
 {
-    ui->spinBox_dimension->clear();
     ui->spinBox_duration->clear();
     ui->spinBox_factor->clear();
     ui->spinBox_fps->clear();
     ui->output->clear();
+    ui->curveX->setChecked(true);
+    ui->curveY->setChecked(false);
     this->setWindowTitle(qApp->applicationName());
-    ui->spinBox_dimension->setValue(1);
     ui->spinBox_factor->setValue(1000);
     ui->spinBox_fps->setValue(24);
     ui->spinBox_duration->setValue(60);
@@ -147,7 +147,7 @@ void a2a::getData()
     ui->actionOpen->setDisabled(true);
     if (!active.isEmpty()) {
         qApp->processEvents();
-        QString result = audio.dat(active,ui->spinBox_fps->value(),ui->spinBox_duration->value(),ui->spinBox_factor->value(),ui->spinBox_dimension->value());
+        QString result = audio.dat(active,ui->spinBox_fps->value(),ui->spinBox_duration->value(),ui->spinBox_factor->value(),ui->curveX->isChecked(),ui->curveY->isChecked());
         if (!result.isEmpty()) {
             ui->output->setPlainText(result);
             ui->actionSave->setEnabled(true);
@@ -187,26 +187,48 @@ void a2a::on_reload_clicked()
 
 void a2a::on_spinBox_duration_valueChanged(int arg1)
 {
-    Q_UNUSED(arg1)
     if (ui->reload->isHidden() && !active.isEmpty())
         ui->reload->show();
+    ui->sliderDuration->setValue(arg1);
 }
 
 void a2a::on_spinBox_factor_valueChanged(int arg1)
 {
-    Q_UNUSED(arg1)
     if (ui->reload->isHidden() && !active.isEmpty())
         ui->reload->show();
+    ui->sliderFactor->setValue(arg1);
 }
 
 void a2a::on_spinBox_fps_valueChanged(int arg1)
+{
+    if (ui->reload->isHidden() && !active.isEmpty())
+        ui->reload->show();
+    ui->sliderFPS->setValue(arg1);
+}
+
+void a2a::on_sliderFPS_valueChanged(int value)
+{
+    ui->spinBox_fps->setValue(value);
+}
+
+void a2a::on_sliderFactor_valueChanged(int value)
+{
+    ui->spinBox_factor->setValue(value);
+}
+
+void a2a::on_sliderDuration_valueChanged(int value)
+{
+    ui->spinBox_duration->setValue(value);
+}
+
+void a2a::on_curveX_stateChanged(int arg1)
 {
     Q_UNUSED(arg1)
     if (ui->reload->isHidden() && !active.isEmpty())
         ui->reload->show();
 }
 
-void a2a::on_spinBox_dimension_valueChanged(int arg1)
+void a2a::on_curveY_stateChanged(int arg1)
 {
     Q_UNUSED(arg1)
     if (ui->reload->isHidden() && !active.isEmpty())

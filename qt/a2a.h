@@ -30,9 +30,13 @@ private slots:
     void on_spinBox_duration_valueChanged(int arg1);
     void on_spinBox_factor_valueChanged(int arg1);
     void on_spinBox_fps_valueChanged(int arg1);
-    void on_spinBox_dimension_valueChanged(int arg1);
     void loadConf();
     void saveConf();
+    void on_sliderFPS_valueChanged(int value);
+    void on_sliderFactor_valueChanged(int value);
+    void on_sliderDuration_valueChanged(int value);
+    void on_curveX_stateChanged(int arg1);
+    void on_curveY_stateChanged(int arg1);
 
 private:
     Ui::a2a *ui;
