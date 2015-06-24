@@ -86,7 +86,7 @@ void a2a::on_actionOpen_triggered()
     if (!fileName.isEmpty()) {
         active = fileName;
         QFileInfo file(fileName);
-        lastDir = file.absoluteFilePath();
+        lastDir = file.absolutePath();
         getData();
     }
     else
