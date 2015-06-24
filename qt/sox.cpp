@@ -2,7 +2,6 @@
 #include <QFile>
 #include <QDir>
 #include <QCoreApplication>
-#include <QDebug>
 #include <QProcess>
 
 Sox::Sox(QObject *parent) :
@@ -10,24 +9,19 @@ Sox::Sox(QObject *parent) :
 {
 }
 
-QString Sox::bin(bool info)
+QString Sox::bin()
 {
     QString path;
     QFile soxApp;
-    QString exe;
-    if (info)
-        exe = "soxi";
-    else
-        exe = "sox";
 
-    if (soxApp.exists(qApp->applicationDirPath()+QDir::separator()+exe+".exe"))
-        path = qApp->applicationDirPath()+QDir::separator()+exe+".exe";
-    else if (soxApp.exists(qApp->applicationDirPath()+QDir::separator()+exe))
-        path = qApp->applicationDirPath()+QDir::separator()+exe;
-    else if (soxApp.exists(QDir::toNativeSeparators("/usr/bin/"+exe)))
-        path = QDir::toNativeSeparators("/usr/bin/"+exe);
-    else if (soxApp.exists(QDir::toNativeSeparators("/usr/local/bin/"+exe)))
-        path = QDir::toNativeSeparators("/usr/local/bin/"+exe);
+    if (soxApp.exists(qApp->applicationDirPath()+QDir::separator()+"sox.exe"))
+        path = qApp->applicationDirPath()+QDir::separator()+"sox.exe";
+    else if (soxApp.exists(qApp->applicationDirPath()+QDir::separator()+"sox"))
+        path = qApp->applicationDirPath()+QDir::separator()+"sox";
+    else if (soxApp.exists(QDir::toNativeSeparators("/usr/bin/sox")))
+        path = QDir::toNativeSeparators("/usr/bin/sox");
+    else if (soxApp.exists(QDir::toNativeSeparators("/usr/local/bin/sox")))
+        path = QDir::toNativeSeparators("/usr/local/bin/sox");
 
     return path;
 }
@@ -35,34 +29,14 @@ QString Sox::bin(bool info)
 QString Sox::about()
 {
     QString desc;
-    if (!bin(false).isEmpty()) {
+    if (!bin().isEmpty()) {
         QProcess proc;
-        proc.start(bin(false)+" --version");
-        if (proc.waitForFinished()) {
-            desc = proc.readAll().simplified();
-            proc.close();
-        }
+        proc.start(bin()+" --version");
+        proc.waitForFinished();
+        desc = proc.readAll().simplified();
+        proc.close();
     }
     return desc;
-}
-
-int Sox::samplerate(QString filename)
-{
-    int result = 0;
-    QFile audiofile;
-    if (audiofile.exists(filename) && !bin(true).isEmpty()) {
-        QProcess proc;
-        proc.start(bin(true)+" -r "+filename);
-        proc.waitForFinished();
-        result = proc.readAll().simplified().toInt();
-        proc.close();
-        if (result==0)
-            emit error(tr("Unable to get samplerate"));
-    }
-    else
-        emit error(tr("Audio file or Soxi does not exists"));
-
-    return result;
 }
 
 QString Sox::dat(QString filename, int fps, int duration, int factor, int dimension)
@@ -72,12 +46,11 @@ QString Sox::dat(QString filename, int fps, int duration, int factor, int dimens
     QString curves;
     QFile audioFile;
     QFile tmp(data);
-    if (audioFile.exists(filename) && !bin(false).isEmpty()) {
+    if (audioFile.exists(filename) && !bin().isEmpty()) {
         if (tmp.exists())
             tmp.remove();
         QProcess proc;
-        QString exestring = bin(false)+" \""+filename+"\" -r "+QString::number(fps)+" \""+data+"\" trim 0 "+QString::number(duration);
-        qDebug() << exestring;
+        QString exestring = bin()+" \""+filename+"\" -r "+QString::number(fps)+" \""+data+"\" trim 0 "+QString::number(duration);
         proc.start(exestring);
         proc.waitForFinished();
         proc.close();
@@ -96,7 +69,6 @@ QString Sox::dat(QString filename, int fps, int duration, int factor, int dimens
     if (!curves.isEmpty()) {
         QString dat;
         QStringList lines = curves.split("\n", QString::SkipEmptyParts);
-        dat.append("; "+qApp->applicationName()+" https://github.com/rcspam/audio2ascii\n; "+filename+"\n\n");
         foreach(QString line, lines) {
             if (!line.startsWith(";")) {
                 QStringList cordinates = line.simplified().split(" ");

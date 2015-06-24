@@ -14,9 +14,8 @@ signals:
     void status(QString msg);
 
 public slots:
-    QString bin(bool info);
+    QString bin();
     QString about();
-    int samplerate(QString filename);
     QString dat(QString filename, int fps, int duration, int factor, int dimension);
 };
 
