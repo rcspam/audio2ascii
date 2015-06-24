@@ -1,8 +1,18 @@
 # audio2ascii
-Convert an audio file to an ascii file read by Natron/Nuke (based on sox)
+![untitled](https://cloud.githubusercontent.com/assets/7461595/8324135/395c37bc-1a4d-11e5-8abf-b077adf4d596.png)
+Convert an audio file to data compatible with Natron/Nuke.
 
-You must add sox: sudo apt-get install sox (on Debian based system)
+#Requirements
+ * Sox (sudo apt-get install sox / yum install sox)
+ * Qt (optional)
+ * Yad (optional)
 
-If you want a gui:
-you must add yad: sudo apt-get install yad (on Debian based system)
-and launch it  with '-g' parameter
+#Usage
+
+Run 'audio2ascii.sh' (add '-g' for optional GUI) or 'audio2ascii-qt'.
+
+#Build
+
+```
+qmake && make
+```
