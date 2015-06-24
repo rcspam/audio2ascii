@@ -102,8 +102,8 @@ if [ $dim -le 2 ];then
 	done < "${data}" > "${out}"
 else
 	echo "  Error dim =$dim :  must 1 or 2"
-	rm ${data}
+	rm "${data}"
 	exit 1
 fi
 echo "Done"
-rm ${data} 
+rm "${data}" 
