@@ -1,6 +1,7 @@
 # audio2ascii
 ![untitled](https://cloud.githubusercontent.com/assets/7461595/8324135/395c37bc-1a4d-11e5-8abf-b077adf4d596.png)
 
+<<<<<<< HEAD
 #About
 
 Convert an audio file to curve data compatible with Natron/Nuke.
