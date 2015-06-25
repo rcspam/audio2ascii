@@ -6,7 +6,7 @@
 
 function usage() {
 	ud=$(basename "$0")
-	echo "Usage: $ud [-g] audio_file file.ascii dim Natron_project_fps lenght [multiplication_factor]"
+	echo "Usage: $ud [-g] audio_file file.ascii [x|xy] Natron_project_fps lenght [Curve_height_in_x] [Curve_lenght_in_x]"
 	echo "-g : start with GUI"
 	echo "Convert audio file (all supported by 'sox') in an ascii file support by Natron"
 	echo "'sox' must be installed"
@@ -17,36 +17,55 @@ function usage() {
 function error() {
 	echo -e "\n$(cat ${error_log})"
 	[[ $gui ]] && yad --center --on-top --geometry="400x120" --image="error" --text="\n\t<b>Sox Error:</b>\n\n\n\t$(cat ${error_log})" 2> /dev/null &
-	sleep 1 # let time to read ${error_log}
-	rm ${error_log}
+	sleep 1 # let time yad to read ${error_log}
+	rm "${data}" "${error_log}"
 	exit $1
+}
+
+function awkmax() {
+	echo $line | grep -v ";" | sed 's/ [[:blank:]]//g;s/[[:space:]]/ /g' |\
+		awk -v maxdx="$maxdx" -v maxdy="$maxdy"\
+		'\
+		{if ($2 < 0) $2 = -$2}\
+		{if (($2) > maxdx) maxdx = ($2)}\
+		{if ($3 < 0) $3 = -$3}\
+		{if (($3) > maxdy) maxdy = ($3)}\
+		{printf "%.10f %.10f", maxdx, maxdy}\
+		'
 }
 
 function awkx() {
 	echo $line | grep -v ";" | sed 's/ [[:blank:]]//g;s/[[:space:]]/ /g' |\
-		awk -v fact="$fact" -v max="$max"\
-			'
-			{printf "%.10f\n", ($2*fact)}\
+		awk -v factx="$factx" -v maxx="$maxx" -v maxdx="$maxdx"\
+			'\
+			{printf "%.10f\n", ($2*factx/maxdx)}\
 			{if ($2 < 0) $2 = -$2}\
-			{if (($2*fact) > max) max = ($2*fact)}\
-			{print max}\
+			{if (($2*factx/maxdx) > maxx) maxx = ($2*factx/maxdx)}\
+			{printf "%.2f %.10f", maxx, maxdx}\
 			'
 }
 
 function awkxy() {
 	echo $line | grep -v ";" | sed 's/ [[:blank:]]//g;s/[[:space:]]/ /g' |\
-		awk -v fact="$fact" -v max="$max"\
-			'
-			{printf "%.10f_%.10f\n", $2*fact, $3*fact}\
+		awk -v factx="$factx" -v facty="$facty" -v maxx="$maxx" -v maxy="$maxy" -v maxdx="$maxdx"  -v maxdy="$maxdy"\
+			'\
+			{printf "%.10f_%.10f\n", ($2*factx/maxdx), ($3*facty/maxdy)}\
 			{if ($2 < 0) $2 = -$2}\
 			{if ($3 < 0) $3 = -$3}\
-			{if ($3 > $2)  $2 = $3}\
-			{if (($2*fact) > max) max = ($2*fact)}\
-			{print max}\
+#			{if ($3 > $2)  $2 = $3}\
+			{if (($2*factx/maxdx) > maxx) maxx = ($2*factx/maxdx)}\
+			{if (($3*facty/maxdy) > maxy) maxy = ($3*facty/maxdy)}\
+			{printf "%.2f %.10f %.2f %.10f", maxx, maxdx, maxy, maxdy}\
 			'
 }
 
-[[ "$1" == "-h" || "$1" == "--help" ]] && usage
+data="/tmp/data_$$_tmp.dat"
+error_log="/tmp/error_log_sox_$$"
+dim_def="^x!xy"
+maxx=0
+maxy=0
+maxdx=0
+maxdy=0
 
 if ! which sox >/dev/null;then
 	echo "$0 require 'sox' which is not installed"
@@ -61,9 +80,12 @@ if [ "$1" == "-g" ]; then
 		exit 1
 	fi
 else
-	gui=
+	gui=""
 fi
 
+[[ "$1" == "-h" || "$1" == "--help" ]] && usage
+
+#GUI
 if [ $gui ];then
 	YAD_TMP=$(mktemp --tmpdir yad.XXXXXXXX)
 	yad	--center --on-top --title="Convert Audio to ascii"\
@@ -72,13 +94,15 @@ if [ $gui ];then
 				--field="<b>Dimensions </b> (on 1 axe\: x or on 2 axes\:xy)\:CB"\
 				--field="<b>Frames/sec </b> (of the Natron project)\:"\
 				--field="<b>Duration</b> (of the curve in secondes)\:"\
-				--field="<b>Multiplcator Factor</b> (default is 1000)\nSet the height of the curve:"\
+				--field="<b>Curve height in x</b> (default is 100):"\
+				--field="<b>Curve lenght in y</b> (default is 100):"\
 				"${1}"\
 				"${2:-"${HOME}/Desktop/curve.ascii"}"\
-				"x!xy"\
+				"${3}"\
 				"${4:-24}"\
 				"${5:-10}"\
-				"${6:-1000}" > "${YAD_TMP}" 2>/dev/null 
+				"${6:-100}"\
+				"${7:-100}" > "${YAD_TMP}" 2>/dev/null 
 	[[ $? = 252 || $? = 1 ]] && rm "${YAD_TMP}" && exit 1
 	
 	in="$(cut -d'|' -f1 < "${YAD_TMP}")"
@@ -86,7 +110,8 @@ if [ $gui ];then
 	dim="$(cut -d'|' -f3 < "${YAD_TMP}")"
 	fps="$(cut -d'|' -f4 < "${YAD_TMP}")"
 	len="$(cut -d'|' -f5 < "${YAD_TMP}")"
-	fact="$(cut -d'|' -f6 < "${YAD_TMP}")"
+	factx="$(cut -d'|' -f6 < "${YAD_TMP}")"
+	facty="$(cut -d'|' -f7 < "${YAD_TMP}")"
 	
 	rm "${YAD_TMP}"
 else
@@ -97,44 +122,55 @@ else
 	dim="${3}"
 	fps="${4}"
 	len="${5}"
-	# multip. factor Default: 1000
-	fact="${6:-1000}"
+	factx="${6:-100}"
+	facty="${7:-100}"
 fi
-
-data="/tmp/data_$$_tmp.dat"
-error_log="/tmp/error_log_sox_$$"
 
 # convert audio to .dat 
 srate=$(sox --i "${in}" 2>${error_log} | grep "^Sample Rate" | awk '{print $4}')
-echo CMD: sox "${in}" -r ${fps} "${data}" vol 0 trim 0 ${len}
+echo CMD: sox "${in}" -r ${fps} "${data}" trim 0 ${len}
 echo -n "Converting $in to Data file with SampleRate $fps (original: $srate)..."
 sox "${in}" -r ${fps} "${data}" trim 0 ${len} 2>${error_log} || error 1
 echo "Done"
 
+#Search the dry maximum variation in x and in y
+echo -n "Search the maximum variation ..."
+while read line
+do
+	read maxdx maxdy <<< $(awkmax)
+done < "${data}"
+echo "maxdx=$maxdx maxdy=$maxdy Done"
+[[ $maxdx == 0 ]] && echo Plat curve: Max variation is 0 && exit
+
 # convert .dat to ascii
-max=0
 echo -n "Converting Data file to $out..."
 while read line
 do
 	if [ "$dim" == "x" ];then
 		# x
-		read dimx max <<< $(awkx)
+		read dimx maxx maxdx_tmp maxdy_tmp <<< $(awkx) 
 		echo $dimx
+		dim_def="^x!xy" # it's a yad param
 	else
 		# xy
-		read dimxy max <<< $(awkxy)
+		read dimxy maxx maxdx_tmp maxy maxdy_tmp <<< $(awkxy)
 		echo $dimxy
+		dim_def="x!^xy" # it's a yad param
 	fi
 done < "${data}" > "${out}"
 echo "Done"
-echo The maximum varation is $max
-[[ gui ]] && { 
-				yad --center --on-top --geometry="400x500" --image="info" --text-info --text="\n\t\tThe maximum varation is <b>$max</b>\n"\
+echo "The maximum varation: x: ${maxx}(${maxdx_tmp}) y: ${maxy}(${maxdy_tmp})" #DEBUG
+
+# Result
+#GUI
+[[ $gui ]] && { 
+				yad --center --on-top --geometry="400x600" --image="info" --text-info\
+					--text="\n\t\t\t\t<b><u>Maximum variations:</u></b>\n\t <small>  Value inside brakets are the maximum before scale</small>\n\n\t\t\t\x:<b> $maxx</b> ($maxdx_tmp)\n\t\t\ty:<b> $maxy</b> ($maxdy_tmp)\n"\
 					--tail  --listen \
-					--button="Change some parameters:2"\
+					--button="Change parameter(s):2"\
 					--button="Ok:0" 2> /dev/null < "${out}"
 				ret=$?
-				[[ $ret == 2 ]] && "${0}" -g "${in}" "${out}" "${dim}" "${fps}" "${len}" "${fact}"
+				[[ $ret == 2 ]] && "${0}" -g "${in}" "${out}" "${dim_def}" "${fps}" "${len}" "${factx}" "${facty}"
 			 }
 			 
-rm "${data}"
+rm "${data}"  "${error_log}"
