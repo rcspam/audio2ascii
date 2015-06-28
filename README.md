@@ -12,10 +12,10 @@
 
 #Installation / Usage
 
-    ```
-    $ wget https://github.com/rcspam/audio2ascii/releases/download/v1.0.1/audio2ascii
-    $ chmod +x ./audio2ascii
-    $ ./audio2ascii --help # launch command line to know parameters
-    $ ./audio2ascii -g # or launch with gui (see Requirements bellow)
-    ```
+```
+$ wget https://github.com/rcspam/audio2ascii/releases/download/v1.0.1/audio2ascii
+$ chmod +x ./audio2ascii
+$ ./audio2ascii --help # launch command line to know parameters
+$ ./audio2ascii -g # or launch with gui (see Requirements bellow)
+```
 
