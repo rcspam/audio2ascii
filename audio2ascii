@@ -133,7 +133,9 @@ echo -n "Converting $in to Data file with SampleRate $fps (original: $srate)..."
 sox "${in}" -r ${fps} "${data}" trim 0 ${len} 2>${error_log} || error 1
 echo "Done"
 
-#Search the dry maximum variation in x and in y
+# Search the dry maximum variation in x and in y
+# we parse $data a first time (awkmax) to pass $madx and $mady as variables
+# to the second parse (awkx or awkxy). 
 echo -n "Search the maximum variation ..."
 while read line
 do
