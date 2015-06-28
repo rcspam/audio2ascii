@@ -1,13 +1,14 @@
 # audio2ascii
 
-    Convert an audio file to an ascii file readable by Natron/Nuke
-
+    Convert an audio file to an ascii file readable by the Natron/Nuke curve editor.
+    
 #Requirements
 
-    *Sox: sudo apt-get install sox or  sudo yum install sox
-	  To support more audio formats than 'wav': sudo apt-get install libsox-fmt-all (debian) 
-	  Fedora: to mp3 support for sox in fedora you can follow [This](https://unix.stackexchange.com/questions/98524/sox-returns-an-error-when-i-try-to-handle-mp3-files)
-    *Yad: If you want a gui: sudo apt-get install yad ; sudo yum install yad
+ * Sox: sudo apt-get install sox or  sudo yum install sox
+		To support more audio formats than 'wav': sudo apt-get install libsox-fmt-all (debian) 
+		Fedora: to mp3 support for sox in fedora you can follow [This](https://unix.stackexchange.com/questions/98524/sox-returns-an-error-when-i-try-to-handle-mp3-files)
+ 
+ * Yad: If you want a gui: sudo apt-get install yad ; sudo yum install yad
 
 #Installation / Usage
 
