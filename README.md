@@ -1,6 +1,6 @@
 # audio2ascii
 
-    Convert an audio file to an ascii file readable by the Natron/Nuke curve editor.
+ Convert an audio file to an ascii file readable by the Natron/Nuke curve editor.
     
 #Requirements
 
