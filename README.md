@@ -20,4 +20,10 @@ $ chmod +x ./audio2ascii
 $ ./audio2ascii --help # launch command line to know the parameters
 $ ./audio2ascii -g # or launch with gui (see Requirements above)
 ```
+#Examples
 
+Some short videos released with the [Natron 2 Snapshot](http://sourceforge.net/projects/natron/files/snapshots/) Transform Node:
+
+* [Test1.mp4](https://dl.dropboxusercontent.com/u/2677320/test1.mp4) ( x curve on scale)
+* [Test2.mp4](https://dl.dropboxusercontent.com/u/2677320/test2.mp4) ( xy curves (stereo) with x translate on left channel,  y translate on right channel )
+* [Test3.mp4](https://dl.dropboxusercontent.com/u/2677320/test3.mp4) (y curve on y translate)
