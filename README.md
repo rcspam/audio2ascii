@@ -4,13 +4,13 @@
     
 #Requirements
 
- * Sox: **sudo apt-get install sox** or  **sudo yum install sox**.
+ * [Sox](http://sox.sourceforge.net/): **sudo apt-get install sox** or  **sudo yum install sox**.
  
     For support more audio formats than 'wav': **sudo apt-get install libsox-fmt-all** (debian).
 		 
     Fedora: for mp3 support for sox you can read [this](https://unix.stackexchange.com/questions/98524/sox-returns-an-error-when-i-try-to-handle-mp3-files)
  
- * Yad: If you want a gui: **sudo apt-get install yad** ; **sudo yum install yad**
+ * [Yad](http://sourceforge.net/projects/yad-dialog): If you want a gui: **sudo apt-get install yad** ; **sudo yum install yad**
 
 #Installation / Usage
 
