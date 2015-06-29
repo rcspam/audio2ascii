@@ -1,14 +1,17 @@
 #!/bin/bash
-
-# audio2ascii audio_file ascii_file dim Natron_project_fps length [multiplication_factor]
-# sox must installed
+#
+# Convert audio files to ascii file importable in Natron/Nuke
+#
+# audio2ascii 'audioFile' 'asciiFile dim NatronProjectFps length [CurveHeightInX] [CurveLenghtInY]
+# sox must be installed (for mp3 format as input see the Readme.md)
 # yad must be installed for the GUI
 
 function usage() {
 	ud=$(basename "$0")
-	echo "Usage: $ud [-g] audio_file file.ascii [x|xy] Natron_project_fps lenght [Curve_height_in_x] [Curve_lenght_in_x]"
+	echo "Usage: $ud [-g] audioFile file.ascii [x|y|xy] NatronProjectFps length [CurveHeightInX] [CurveLenghtInY]"
 	echo "-g : start with GUI"
-	echo "Convert audio file (all supported by 'sox') in an ascii file support by Natron"
+	echo "x|y|xy: In which dimension calculate the curve (e.g.: Audio files in stereo can be calculate in xy)"
+	echo "Convert audio file (all supported by 'sox') in an ascii file support by Natron/Nuke"
 	echo "'sox' must be installed"
 	echo "Only for GUI:'yad' must be installed"
 	exit
@@ -49,10 +52,9 @@ function awkxy() {
 	echo $line | grep -v ";" | sed 's/ [[:blank:]]//g;s/[[:space:]]/ /g' |\
 		awk -v factx="$factx" -v facty="$facty" -v maxx="$maxx" -v maxy="$maxy" -v maxdx="$maxdx"  -v maxdy="$maxdy"\
 			'\
-			{printf "%.10f_%.10f\n", ($2*factx/maxdx), ($3*facty/maxdy)}\
+			{printf "%.10f %.10f\n", ($2*factx/maxdx), ($3*facty/maxdy)}\
 			{if ($2 < 0) $2 = -$2}\
 			{if ($3 < 0) $3 = -$3}\
-#			{if ($3 > $2)  $2 = $3}\
 			{if (($2*factx/maxdx) > maxx) maxx = ($2*factx/maxdx)}\
 			{if (($3*facty/maxdy) > maxy) maxy = ($3*facty/maxdy)}\
 			{printf "%.2f %.10f %.2f %.10f", maxx, maxdx, maxy, maxdy}\
@@ -61,7 +63,7 @@ function awkxy() {
 
 data="/tmp/data_$$_tmp.dat"
 error_log="/tmp/error_log_sox_$$"
-dim_def="^x!xy" # Default x dimension 
+dim_def="^x!y!xy" # Default: x dimension 
 maxx=0
 maxy=0
 maxdx=0
@@ -145,32 +147,60 @@ echo "maxdx=$maxdx maxdy=$maxdy Done"
 [[ $maxdx == 0 ]] && echo Plat curve: Max variation is 0 && exit
 
 # convert .dat to ascii
+
 echo -n "Converting Data file to $out..."
+nr=0 # line count
 while read line
 do
 	if [ "$dim" == "x" ];then
 		# x
 		read dimx maxx maxdx_tmp maxdy_tmp <<< $(awkx) 
-		echo $dimx
-		dim_def="^x!xy" # it's a yad param
+		[[ -n $dimx ]] && nr=$((nr+1)) && echo "$dimx" # $dimx test to avoid empty lines
+		
+		# gui info
+		dim_def="^x!y!xy"
+		print_dim="\t\t\tX:<b> $maxx</b> ($maxdx_tmp)"
+	elif [ "$dim" == "y" ];then
+		# y
+		read dimx dimy maxx maxdx_tmp maxy maxdy_tmp <<< $(awkxy)
+		[[ -n $dimx ]] && nr=$((nr+1)) && echo "$dimy" # $dimx test to avoid empty lines
+		
+		# gui info
+		dim_def="x!^y!xy"
+		print_dim="\t\t\tY:<b> $maxy</b> ($maxdy_tmp)"
 	else
 		# xy
-		read dimxy maxx maxdx_tmp maxy maxdy_tmp <<< $(awkxy)
-		echo $dimxy
-		dim_def="x!^xy" # it's a yad param
+		read dimx dimy maxx maxdx_tmp maxy maxdy_tmp <<< $(awkxy)
+		[[ -n $dimx ]] && nr=$((nr+1)) && echo "${dimx}_${dimy}" # $dimx test to avoid empty lines
+		
+		# gui info
+		dim_def="x!y!^xy"
+		print_dim="\t\t\tX:<b> $maxx</b> ($maxdx_tmp)\n\t\t\tY:<b> $maxy</b> ($maxdy_tmp)"
 	fi
 done < "${data}" > "${out}"
 echo "Done"
-echo "The maximum varation: x: ${maxx}(${maxdx_tmp}) y: ${maxy}(${maxdy_tmp})" #DEBUG
 
 # Result
+# result non GUI
+print_x="X: ${maxx}(${maxdx_tmp})"
+[[ "$dim" == "y" ]] && print_x="X: 0()"
+print_y="\t\t      Y: ${maxy}(${maxdy_tmp})"
+echo -e "The maximum varation: ${print_x}\n${print_y}" 
+echo -e "\t\t      $nr keys in $(($nr/$fps)) seconds  ($fps frames/s)"
 #GUI
 [[ $gui ]] && { 
+				print_head="\n\t\t\t\t<b><u>Maximum variations:</u></b>\n"
+				print_nbkey="\t\t\t<b>$nr</b> keys in <b>$(($nr/$fps))</b> seconds  ($fps frames/s)"
+				print_extra="\t<span color='grey'><small>\t\tInside brakets: maximum before scaling</small></span>\n"
+				print_out="Result in <b>${out}</b>:"
+				print_info="${print_head}\n${print_dim}\n${print_nbkey}\n${print_extra}\n${print_out}"
+				
 				yad --center --on-top --geometry="400x600" --image="info" --text-info\
-					--text="\n\t\t\t\t<b><u>Maximum variations:</u></b>\n\t <small>  Value inside brakets are the maximum before scale</small>\n\n\t\t\t\x:<b> $maxx</b> ($maxdx_tmp)\n\t\t\ty:<b> $maxy</b> ($maxdy_tmp)\n"\
+					--text="${print_info}"\
 					--tail  --listen \
 					--button="Change parameter(s):2"\
 					--button="Ok:0" 2> /dev/null < "${out}"
+					
 				ret=$?
 				[[ $ret == 2 ]] && "${0}" -g "${in}" "${out}" "${dim_def}" "${fps}" "${len}" "${factx}" "${facty}"
 			 }
