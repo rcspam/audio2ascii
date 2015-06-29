@@ -18,6 +18,6 @@
 $ wget https://github.com/rcspam/audio2ascii/releases/download/v1.0.1/audio2ascii
 $ chmod +x ./audio2ascii
 $ ./audio2ascii --help # launch command line to know the parameters
-$ ./audio2ascii -g # or launch with gui (see Requirements bellow)
+$ ./audio2ascii -g # or launch with gui (see Requirements above)
 ```
 
