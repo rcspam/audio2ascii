@@ -1,7 +1,7 @@
 # audio2ascii
 
  Convert an audio file to an ascii file readable by the Natron/Nuke curve editor (Linux only).
- 
+
  A Qt version (Linux + Windows) are currently being developed by @olear at https://github.com/olear/audio2ascii
 
 #Requirements
@@ -22,7 +22,7 @@ $ tar xvzf audio2ascii-1.3.tar.gz
 $ cd audio2ascii-1.3
 $ cp ./audio2ascii.sh /somewhere/in/your/path  # must be in your $PATH
 ```
-to install the plugin: AudioToAscii.py:
+If you want start audio2ascii from Natron, you should run it with its gui (yad must be installed). To install the plugin AudioToAscii.py and its icon:
 ```
 $ # create the local Plugins directory if it doesn't exist
 $ mkdir $HOME/.local/share/INRIA/Natron/Plugins
