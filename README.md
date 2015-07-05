@@ -1,6 +1,8 @@
 # audio2ascii
 
- Convert an audio file to an ascii file readable by the Natron/Nuke curve editor (Linux only).
+ Convert an audio file to an ascii file readable by the Natron/Nuke curve editor (Linux only, can be adapted for OSX).
+ 
+ ![screenshot-1](https://cloud.githubusercontent.com/assets/10021906/8510744/7c5516fc-22f8-11e5-973f-3f4599b0d2e0.png)
 
  A Qt version (Linux + Windows) are currently being developed by @olear at https://github.com/olear/audio2ascii
 
