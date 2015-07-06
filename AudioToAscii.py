@@ -6,6 +6,7 @@ import NatronEngine
 
 # extra lib added
 import os
+from os import *
 
 def getPluginID():
     return "AudioToAscii"
@@ -26,14 +27,55 @@ def getDescription():
     return "Launch external bash script Audio2Ascii (only linux).\nIt convert audio file into ascii curve that you can import in the Natron curve editor.\You can download it at https://github.com/rcspam/audio2ascii)\nYou must have it in your $PATH."
     
 # extra defs added
-def pressBut(thisParam, thisNode, thisGroup, app, userEdited):
+def animCurves(thisParam, fileAC, dimAC, fpsAC, durationAC):
+    #os.system("yad --text  '2" + fileA + " " + dimXY + "' &")
+    asciiAC = open(fileAC, "r")
+    lineAC = int(fpsAC) * int(durationAC) + 1
+    if dimAC == "x":
+        for frameC in range(1,lineAC):
+            x = asciiAC.readline()
+            # thisParam.setValueAtTime(value, time [ , dimension=0 ] )
+            thisParam.setValueAtTime(float(x), frameC, 0)
+    elif dimAC == "y":
+        for frameC in range(1,lineAC):
+            y = asciiAC.readline()
+            thisParam.setValueAtTime(float(y), frameC, 1)
+    else:
+        for frameC in range(1,lineAC):
+            x, y = asciiAC.readline().split ("_")
+            #y = str.strip(y)
+            thisParam.setValueAtTime(float(x), frameC, 0)
+            thisParam.setValueAtTime(float(y), frameC, 1)
+
+def isUpdate(thisParam, thisNode, thisGroup, app, userEdited):
+    global ascii_file, dim,fps, duration
     # You can change the call to your prog here	
-    a2a = "audio2ascii.sh -g " 
-    audiofile = thisNode.inputFile.get()
-    if audiofile and thisParam == thisNode.launchButton:
-        os.system(a2a + audiofile + "&")
-    return 1
-    
+    a2a = "audio2ascii.sh -g "
+    # file that contains the path of the resultcurve file product by audio2ascii bash script
+    tmp_file_path = "/tmp/Natron.audio2ascii"
+    audio_file = thisNode.inputFile.get()
+
+    # Launch Audio2Ascii
+    if audio_file and thisParam == thisNode.launchButton:
+        os.system(a2a + audio_file + "&")
+
+    # Update the resultant ascii file in the path
+    if os.path.isfile(tmp_file_path) and thisParam == thisNode.copyCurve:
+        name_in_file = open(tmp_file_path, "r")
+        ascii_file, dim, fps, duration = name_in_file.readline().split()
+        # delete \n in dim
+        duration = str.strip(duration)
+        if ascii_file is not None:
+	        thisNode.curveFile.set(ascii_file)
+        name_in_file.close()
+
+	# Import Curve
+    if ascii_file and thisParam == thisNode.importCurve:
+        #os.system("yad --text  '1" + ascii_file + " " + dim + "' &")
+        animCurves(thisNode.curveIn, ascii_file, dim, fps, duration)
+
+## / extra defs
+
 def createInstance(app,group):
 
     #Create all nodes in the group
@@ -90,16 +132,16 @@ def createInstance(app,group):
     if param is not None:
         param.setVisible(False)
         del param
+
     param = lastNode.getParam("onParamChanged")
     if param is not None:
-        param.setValue("AudioToAscii.pressBut")
+        param.setValue("AudioToAscii.isUpdate")
         del param
+
 
     #Create the user-parameters
     lastNode.userNatron = lastNode.createPageParam("userNatron", "User")
-    
     param = lastNode.createFileParam("inputFile", "Audio File")
-    
     param.setSequenceEnabled(False)
 
     #Add the param to the page
@@ -113,7 +155,7 @@ def createInstance(app,group):
     del param
 
     param = lastNode.createButtonParam("launchButton", "Convert audio file with audio2ascii")
-    
+
     #Add the param to the page
     lastNode.userNatron.addParam(param)
 
@@ -124,13 +166,73 @@ def createInstance(app,group):
     param.setEvaluateOnChange(False)
     lastNode.launchButton = param
     del param
-    
+
+    param = lastNode.createFileParam("curveFile", "Curve File")
+    param.setSequenceEnabled(False)
+
+    #Add the param to the page
+    lastNode.userNatron.addParam(param)
+
+    #Set param properties
+    param.setHelp("")
+    param.setAddNewLine(True)
+    param.setAnimationEnabled(False)
+    lastNode.curveFile = param
+    del param
+
+    param = lastNode.createButtonParam("copyCurve", "Reload last curve file path")
+
+    #Add the param to the page
+    lastNode.userNatron.addParam(param)
+
+    #Set param properties
+    param.setHelp("")
+    param.setAddNewLine(False)
+    param.setPersistant(False)
+    param.setEvaluateOnChange(False)
+    lastNode.copyCurve = param
+    del param
+
+    param = lastNode.createDouble2DParam("curveIn", "Curve ")
+    param.setMinimum(-2.14748e+09, 0)
+    param.setMaximum(2.14748e+09, 0)
+    param.setDisplayMinimum(0, 0)
+    param.setDisplayMaximum(500, 0)
+    param.setMinimum(-2.14748e+09, 1)
+    param.setMaximum(2.14748e+09, 1)
+    param.setDisplayMinimum(0, 1)
+    param.setDisplayMaximum(500, 1)
+
+    #Add the param to the page
+    lastNode.userNatron.addParam(param)
+
+    #Set param properties
+    param.setHelp("")
+    param.setAddNewLine(True)
+    param.setAnimationEnabled(True)
+    lastNode.curveIn = param
+    del param
+
+    param = lastNode.createButtonParam("importCurve", "Generate the curve")
+
+    #Add the param to the page
+    lastNode.userNatron.addParam(param)
+
+    #Set param properties
+    param.setHelp("")
+    param.setAddNewLine(True)
+    param.setPersistant(False)
+    param.setEvaluateOnChange(False)
+    lastNode.importCurve = param
+    del param
+
     # extra callback added
-    app.AudioToAscii1.onParamChanged.set("AudioToAscii.pressBut")
-    
+    app.AudioToAscii1.onParamChanged.set("AudioToAscii.isUpdate")    
+
     #Refresh the GUI with the newly created parameters
     lastNode.refreshUserParamsGUI()
     del lastNode
 
     #Now that all nodes are created we can connect them together, restore expressions
     groupOutput1.connectInput(0, groupInput1)
+

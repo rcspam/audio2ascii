@@ -2,7 +2,7 @@
 #
 # Convert audio files to ascii file importable in Natron/Nuke
 #
-# audio2ascii 'audioFile' 'asciiFile dim NatronProjectFps length [CurveHeightInX] [CurveLenghtInY]
+# audio2ascii 'audioFile' 'asciiFile' dim NatronProjectFps length [CurveHeightInX] [CurveLenghtInY]
 # sox must be installed (for mp3 format as input see the Readme.md)
 # yad must be installed for the GUI
 
@@ -63,6 +63,7 @@ function awkxy() {
 
 data="/tmp/data_$$_tmp.dat"
 error_log="/tmp/error_log_sox_$$"
+natron_curve_file="/tmp/Natron.audio2ascii"
 dim_def="^x!y!xy" # Default: x dimension 
 maxx=0
 maxy=0
@@ -179,6 +180,8 @@ do
 	fi
 done < "${data}" > "${out}"
 echo "Done"
+# Create Natron "communication" file  
+echo "${out}" "${dim}" "${fps}" "${len}"> "${natron_curve_file}"
 
 # Result
 # result non GUI
