@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Convert audio files to ascii file importable in Natron/Nuke
+# Bash scrpit to convert audio files to ascii file importable in Natron/Nuke
 #
 # audio2ascii 'audioFile' 'asciiFile' dim NatronProjectFps Duration [CurveHeightInX] [CurveLenghtInY]
 # sox must be installed (for mp3 format as input see the Readme.md)
