@@ -5,7 +5,7 @@
 
  A plugin for Natron 2.0 can be installed
  
- ![screenshot-2](https://cloud.githubusercontent.com/assets/10021906/8510744/7c5516fc-22f8-11e5-973f-3f4599b0d2e0.png)
+ ![screenshot-2](https://cloud.githubusercontent.com/assets/10021906/8550164/3fd4ae8a-24cf-11e5-9c1d-87d153b72dec.png)
 
 
  A Qt version (Linux + Windows) are currently being developed by [olear](https://github.com/olear/audio2ascii)
