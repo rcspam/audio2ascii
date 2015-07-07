@@ -179,7 +179,7 @@ def createInstance(app,group):
     param.setHelp("")
     param.setAddNewLine(True)
     param.setAnimationEnabled(False)
-    param.setDefaultValue("/home/rapha/Bureau/curve.ascii")
+    param.setDefaultValue("/tmp/curve.ascii")
     lastNode.curveFile = param
     del param
 
@@ -278,7 +278,7 @@ def createInstance(app,group):
     lastNode.userNatron.addParam(param)
 
     #Set param properties
-    param.setHelp("Start frame of the generate curve")
+    param.setHelp("Start the generate curve at this frame on the time")
     param.setAddNewLine(True)
     param.setAnimationEnabled(True)
     lastNode.atFrameNum = param

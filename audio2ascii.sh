@@ -101,7 +101,7 @@ if [ $gui ];then
 				--field="<b>x curve height</b> (default is 100):"\
 				--field="<b>y curve height</b> (default is 100):"\
 				"${1}"\
-				"${2:-"${HOME}/Desktop/curve.ascii"}"\
+				"${2:-"/tmp/curve.ascii"}"\
 				"${3:-"${dim_def}"}"\
 				"${4:-24}"\
 				"${5:-10}"\
