@@ -2,11 +2,7 @@
 #
 # Convert audio files to ascii file importable in Natron/Nuke
 #
-<<<<<<< HEAD
-# audio2ascii 'audioFile' 'asciiFile' dim NatronProjectFps length [CurveHeightInX] [CurveLenghtInY]
-=======
 # audio2ascii 'audioFile' 'asciiFile' dim NatronProjectFps Duration [CurveHeightInX] [CurveLenghtInY]
->>>>>>> test
 # sox must be installed (for mp3 format as input see the Readme.md)
 # yad must be installed for the GUI
 
