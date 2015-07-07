@@ -57,7 +57,7 @@ def isUpdate(thisParam, thisNode, thisGroup, app, userEdited):
 
     # Launch Audio2Ascii
     if audio_file and thisParam == thisNode.launchButton:
-        os.system(a2a + audio_file + "&")
+        os.system(a2a + "\""+ audio_file + "\"" + "&")
 
     # Update the resultant ascii file in the path
     if os.path.isfile(tmp_file_path) and thisParam == thisNode.copyCurve:
