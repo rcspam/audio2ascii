@@ -5,7 +5,8 @@
 import NatronEngine
 
 # extra lib added
-import os
+import os, time
+from os import *
 
 def getPluginID():
     return "AudioToAscii"
@@ -26,14 +27,73 @@ def getDescription():
     return "Launch external bash script Audio2Ascii (only linux).\nIt convert audio file into ascii curve that you can import in the Natron curve editor.\You can download it at https://github.com/rcspam/audio2ascii)\nYou must have it in your $PATH."
     
 # extra defs added
-def pressBut(thisParam, thisNode, thisGroup, app, userEdited):
-    # You can change the call to your prog here	
-    a2a = "audio2ascii.sh -g " 
-    audiofile = thisNode.inputFile.get()
-    if audiofile and thisParam == thisNode.launchButton:
-        os.system(a2a + audiofile + "&")
-    return 1
+
+def audioToAscii(audioFileATA, asciiFileATA, dimATA, fpsATA, durationATA, xHeightATA, yHeightATA):
+    # Change the call to audio2ascii executable here	
+    exec_a2a = str("audio2ascii.sh ")
+    # Files to pass
+    files_a2a = str("'" + str(audioFileATA) + "' '" + str(asciiFileATA) + "' ")
+    # Param to pass
+    param_a2a = str(dimATA) + " " +  str(fpsATA) + " " +  str(durationATA) + " " +  str(xHeightATA)  + " " + str(yHeightATA)
+    # Launch audio2ascii
+    ret_a2a = os.system(exec_a2a + files_a2a + param_a2a )
+    return ret_a2a
+
+def animCurves(thisParam, fileAC, dimAC, fpsAC, durationAC ,frameStartAC):
+    # ascii file
+    asciiAC = open(fileAC, "r")
+    # end frame
+    lineAC = int(fpsAC) * int(durationAC) + int(frameStartAC)
+    # anim x
+    if dimAC == 0:
+        # reset x before recalculate
+        thisParam.removeAnimation(0)
+        for frameC in range(int(frameStartAC),lineAC + int(frameStartAC)):
+            x = asciiAC.readline()
+            thisParam.setValueAtTime(float(x), frameC, 0)
+    # anim y
+    elif dimAC == 1:
+        # reset y before recalculate
+        thisParam.removeAnimation(1)
+        for frameC in range(int(frameStartAC),lineAC):
+            y = asciiAC.readline()
+            thisParam.setValueAtTime(float(y), frameC, 1)
+    # anim yx
+    else:
+        # reset x and y before recalculate
+        thisParam.removeAnimation(0)
+        thisParam.removeAnimation(1)
+        for frameC in range(int(frameStartAC),lineAC):
+            x, y = asciiAC.readline().split ("_")
+            thisParam.setValueAtTime(float(x), frameC, 0)
+            thisParam.setValueAtTime(float(y), frameC, 1)
+
+def paramHasChanged(thisParam, thisNode, thisGroup, app, userEdited):
+    # audio input file
+    audio_file = thisNode.inputFile.get()
+    # ascii output file
+    ascii_file = thisNode.curveFile.get()
     
+    # convert dimension in comprehensive thing for audio2ascii script 
+    dim = thisNode.dimEnsion.get()
+    if dim == 0:
+        dimension = "x"
+    elif dim == 1:
+        dimension = "y"
+    elif dim == 2:
+        dimension = "xy" 
+
+    # Import Curve
+    if ascii_file is not None and audio_file is not None and thisParam == thisNode.importCurve:
+        ret_exec = audioToAscii(audio_file, ascii_file, dimension, thisNode.framesPerSec.get(), thisNode.duraTion.get(), thisNode.xHeight.get(), thisNode.yHeight.get())
+        # test and wait end of audio2ascii 
+        if ret_exec == 0:
+            # calculate animation 
+            animCurves(thisNode.curveIn, ascii_file, thisNode.dimEnsion.get(), thisNode.framesPerSec.get(), thisNode.duraTion.get(), thisNode.atFrameNum.get())
+            
+
+## / extra defs
+
 def createInstance(app,group):
 
     #Create all nodes in the group
@@ -81,25 +141,22 @@ def createInstance(app,group):
 
     del lastNode
 
-
-
-
     #Create the parameters of the group node the same way we did for all internal nodes
     lastNode = group
     param = lastNode.getParam("highDefUpstream")
     if param is not None:
         param.setVisible(False)
         del param
+
     param = lastNode.getParam("onParamChanged")
     if param is not None:
-        param.setValue("AudioToAscii.pressBut")
+        param.setValue("AudioToAscii.paramHasChanged")
         del param
+
 
     #Create the user-parameters
     lastNode.userNatron = lastNode.createPageParam("userNatron", "User")
-    
     param = lastNode.createFileParam("inputFile", "Audio File")
-    
     param.setSequenceEnabled(False)
 
     #Add the param to the page
@@ -112,25 +169,161 @@ def createInstance(app,group):
     lastNode.inputFile = param
     del param
 
-    param = lastNode.createButtonParam("launchButton", "Convert audio file with audio2ascii")
-    
+    param = lastNode.createFileParam("curveFile", "Curve File")
+    param.setSequenceEnabled(False)
+
     #Add the param to the page
     lastNode.userNatron.addParam(param)
 
     #Set param properties
     param.setHelp("")
     param.setAddNewLine(True)
+    param.setAnimationEnabled(False)
+    param.setDefaultValue("/home/rapha/Bureau/curve.ascii")
+    lastNode.curveFile = param
+    del param
+
+    param = lastNode.createChoiceParam("dimEnsion", "Dimension")
+    entries = [ ("x", ""),
+    ("y", ""),
+    ("xy", "")]
+    param.setOptions(entries)
+    del entries
+
+    #Add the param to the page
+    lastNode.userNatron.addParam(param)
+
+    #Set param properties
+    param.setHelp("Dimension curve folowing 'x axe', 'y axe' or 'x and y axes'")
+    param.setAddNewLine(True)
+    param.setAnimationEnabled(True)
+    options = param.getOptions()
+    foundOption = False
+    for i in range(len(options)):
+        if options[i] == "x":
+            param.setValue(i)
+            foundOption = True
+            break
+    if not foundOption:
+        app.writeToScriptEditor("Could not set option for parameter dimEnsion of node AudioToAscii1")
+    lastNode.dimEnsion = param
+    del param
+
+    param = lastNode.createIntParam("framesPerSec", "Frames / sec")
+    param.setDisplayMinimum(0, 0)
+    param.setDisplayMaximum(100, 0)
+    param.setDefaultValue(24, 0)
+
+    #Add the param to the page
+    lastNode.userNatron.addParam(param)
+
+    #Set param properties
+    param.setHelp("Calculate curve with this frame rate")
+    param.setAddNewLine(True)
+    param.setAnimationEnabled(True)
+    lastNode.framesPerSec = param
+    del param
+
+    param = lastNode.createIntParam("duraTion", "Duration")
+    param.setDisplayMinimum(0, 0)
+    param.setDisplayMaximum(200, 0)
+    param.setDefaultValue(3, 0)
+
+    #Add the param to the page
+    lastNode.userNatron.addParam(param)
+
+    #Set param properties
+    param.setHelp("Duration of the curve in seconds")
+    param.setAddNewLine(True)
+    param.setAnimationEnabled(True)
+    lastNode.duraTion = param
+    del param
+
+    param = lastNode.createIntParam("xHeight", "x curve height")
+    param.setDisplayMinimum(0, 0)
+    param.setDisplayMaximum(500, 0)
+    param.setDefaultValue(100, 0)
+
+    #Add the param to the page
+    lastNode.userNatron.addParam(param)
+
+    #Set param properties
+    param.setHelp("Height of x deviation in pixels")
+    param.setAddNewLine(True)
+    param.setAnimationEnabled(True)
+    lastNode.xHeight = param
+    del param
+
+    param = lastNode.createIntParam("yHeight", "y curve height")
+    param.setDisplayMinimum(0, 0)
+    param.setDisplayMaximum(500, 0)
+    param.setDefaultValue(100, 0)
+
+    #Add the param to the page
+    lastNode.userNatron.addParam(param)
+
+    #Set param properties
+    param.setHelp("Height of y deviation in pixels")
+    param.setAddNewLine(True)
+    param.setAnimationEnabled(True)
+    lastNode.yHeight = param
+    del param
+
+    param = lastNode.createIntParam("atFrameNum", "Start at frame")
+    param.setDisplayMinimum(1, 0)
+    param.setDisplayMaximum(500, 0)
+    param.setDefaultValue(1, 0)
+
+    #Add the param to the page
+    lastNode.userNatron.addParam(param)
+
+    #Set param properties
+    param.setHelp("Start frame of the generate curve")
+    param.setAddNewLine(True)
+    param.setAnimationEnabled(True)
+    lastNode.atFrameNum = param
+    del param
+
+    param = lastNode.createButtonParam("importCurve", "Generate the curve")
+
+    #Add the param to the page
+    lastNode.userNatron.addParam(param)
+
+    #Set param properties
+    param.setHelp("Generate curve from parameters above")
+    param.setAddNewLine(True)
     param.setPersistant(False)
     param.setEvaluateOnChange(False)
-    lastNode.launchButton = param
+    lastNode.importCurve = param
     del param
     
+    param = lastNode.createDouble2DParam("curveIn", "Curve ")
+    param.setMinimum(-2.14748e+09, 0)
+    param.setMaximum(2.14748e+09, 0)
+    param.setDisplayMinimum(0, 0)
+    param.setDisplayMaximum(500, 0)
+    param.setMinimum(-2.14748e+09, 1)
+    param.setMaximum(2.14748e+09, 1)
+    param.setDisplayMinimum(0, 1)
+    param.setDisplayMaximum(500, 1)
+
+    #Add the param to the page
+    lastNode.userNatron.addParam(param)
+
+    #Set param properties
+    param.setHelp("x and y curve generate by the Generate button")
+    param.setAddNewLine(True)
+    param.setAnimationEnabled(True)
+    lastNode.curveIn = param
+    del param
+
     # extra callback added
-    app.AudioToAscii1.onParamChanged.set("AudioToAscii.pressBut")
-    
+    app.AudioToAscii1.onParamChanged.set("AudioToAscii.paramHasChanged")    
+
     #Refresh the GUI with the newly created parameters
     lastNode.refreshUserParamsGUI()
     del lastNode
 
     #Now that all nodes are created we can connect them together, restore expressions
     groupOutput1.connectInput(0, groupInput1)
+
