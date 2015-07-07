@@ -2,13 +2,17 @@
 #
 # Convert audio files to ascii file importable in Natron/Nuke
 #
+<<<<<<< HEAD
 # audio2ascii 'audioFile' 'asciiFile' dim NatronProjectFps length [CurveHeightInX] [CurveLenghtInY]
+=======
+# audio2ascii 'audioFile' 'asciiFile' dim NatronProjectFps Duration [CurveHeightInX] [CurveLenghtInY]
+>>>>>>> test
 # sox must be installed (for mp3 format as input see the Readme.md)
 # yad must be installed for the GUI
 
 function usage() {
 	ud=$(basename "$0")
-	echo "Usage: $ud [-g] audioFile file.ascii [x|y|xy] NatronProjectFps length [CurveHeightInX] [CurveLenghtInY]"
+	echo "Usage: $ud [-g] audioFile file.ascii [x|y|xy] NatronProjectFps duration [CurveHeightInX] [CurveLenghtInY]"
 	echo "-g : start with GUI"
 	echo "x|y|xy: In which dimension calculate the curve (e.g.: Audio files in stereo can be calculate in xy)"
 	echo "Convert audio file (all supported by 'sox') in an ascii file support by Natron/Nuke"
@@ -63,7 +67,8 @@ function awkxy() {
 
 data="/tmp/data_$$_tmp.dat"
 error_log="/tmp/error_log_sox_$$"
-natron_curve_file="/tmp/Natron.audio2ascii"
+# abandoned (it was for first versions of natron plugin)
+#natron_curve_file="/tmp/Natron.audio2ascii"
 dim_def="^x!y!xy" # Default: x dimension 
 maxx=0
 maxy=0
@@ -97,8 +102,8 @@ if [ $gui ];then
 				--field="<b>Dimensions </b> (on 1 axe\: x or on 2 axes\:xy)\:CB"\
 				--field="<b>Frames/sec </b> (of the Natron project)\:"\
 				--field="<b>Duration</b> (of the curve in secondes)\:"\
-				--field="<b>Curve height in x</b> (default is 100):"\
-				--field="<b>Curve lenght in y</b> (default is 100):"\
+				--field="<b>x curve height</b> (default is 100):"\
+				--field="<b>y curve height</b> (default is 100):"\
 				"${1}"\
 				"${2:-"${HOME}/Desktop/curve.ascii"}"\
 				"${3:-"${dim_def}"}"\
@@ -112,7 +117,7 @@ if [ $gui ];then
 	out="$(cut -d'|' -f2 < "${YAD_TMP}")"
 	dim="$(cut -d'|' -f3 < "${YAD_TMP}")"
 	fps="$(cut -d'|' -f4 < "${YAD_TMP}")"
-	len="$(cut -d'|' -f5 < "${YAD_TMP}")"
+	dur="$(cut -d'|' -f5 < "${YAD_TMP}")"
 	factx="$(cut -d'|' -f6 < "${YAD_TMP}")"
 	facty="$(cut -d'|' -f7 < "${YAD_TMP}")"
 	
@@ -124,16 +129,16 @@ else
 	out="${2}"
 	dim="${3}"
 	fps="${4}"
-	len="${5}"
+	dur="${5}"
 	factx="${6:-100}"
 	facty="${7:-100}"
 fi
 
 # convert audio to .dat 
 srate=$(sox --i "${in}" 2>${error_log} | grep "^Sample Rate" | awk '{print $4}')
-echo CMD: sox "${in}" -r ${fps} "${data}" trim 0 ${len}
+echo CMD: sox "${in}" -r ${fps} "${data}" trim 0 ${dur}
 echo -n "Converting $in to Data file with SampleRate $fps (original: $srate)..."
-sox "${in}" -r ${fps} "${data}" trim 0 ${len} 2>${error_log} || error 1
+sox "${in}" -r ${fps} "${data}" trim 0 ${dur} 2>${error_log} || error 1
 echo "Done"
 
 # Search the dry maximum variation in x and in y
@@ -160,7 +165,7 @@ do
 		
 		# gui info
 		dim_def="^x!y!xy"
-		print_dim="\t\t\tX:<b> $maxx</b> ($maxdx_tmp)"
+		print_dim="\t\t\tx:<b> $maxx</b> ($maxdx_tmp)"
 	elif [ "$dim" == "y" ];then
 		# y
 		read dimx dimy maxx maxdx_tmp maxy maxdy_tmp <<< $(awkxy)
@@ -168,7 +173,7 @@ do
 		
 		# gui info
 		dim_def="x!^y!xy"
-		print_dim="\t\t\tY:<b> $maxy</b> ($maxdy_tmp)"
+		print_dim="\t\t\ty:<b> $maxy</b> ($maxdy_tmp)"
 	else
 		# xy
 		read dimx dimy maxx maxdx_tmp maxy maxdy_tmp <<< $(awkxy)
@@ -176,12 +181,13 @@ do
 		
 		# gui info
 		dim_def="x!y!^xy"
-		print_dim="\t\t\tX:<b> $maxx</b> ($maxdx_tmp)\n\t\t\tY:<b> $maxy</b> ($maxdy_tmp)"
+		print_dim="\t\t\tx:<b> $maxx</b> ($maxdx_tmp)\n\t\t\ty:<b> $maxy</b> ($maxdy_tmp)"
 	fi
 done < "${data}" > "${out}"
 echo "Done"
+# abandoned (it was for first versions of natron plugin)
 # Create Natron "communication" file  
-echo "${out}" "${dim}" "${fps}" "${len}"> "${natron_curve_file}"
+# echo "${out}" "${dim}" "${fps}" "${dur}"> "${natron_curve_file}"
 
 # Result
 # result non GUI
@@ -205,7 +211,7 @@ echo -e "\t\t      $nr keys in $(($nr/$fps)) seconds  ($fps frames/s)"
 					--button="Ok:0" 2> /dev/null < "${out}"
 					
 				ret=$?
-				[[ $ret == 2 ]] && "${0}" -g "${in}" "${out}" "${dim_def}" "${fps}" "${len}" "${factx}" "${facty}"
+				[[ $ret == 2 ]] && "${0}" -g "${in}" "${out}" "${dim_def}" "${fps}" "${dur}" "${factx}" "${facty}"
 			 }
 			 
 rm "${data}"  "${error_log}"
