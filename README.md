@@ -1,5 +1,6 @@
 # audio2ascii
-  Convert an audio file to an ascii file readable by the Natron2.0/Nuke curve editor (Linux version, but can be adapted for OSX or other Unix-like).
+  Natron2.0 python plugin to animate you parameters with waveform from an audio file(mp3, wav,aiff,...).
+  It use a bash script that you must have in your $PATH. (This is a Linux version, but it can be easily adapted for OSX or other Unix-like).
 
  ![frame](https://cloud.githubusercontent.com/assets/10021906/8601788/af3e4966-266e-11e5-9c08-2ef884d485cd.png)
 
@@ -8,7 +9,7 @@
  ![screenshot-2](https://cloud.githubusercontent.com/assets/10021906/8550164/3fd4ae8a-24cf-11e5-9c1d-87d153b72dec.png)
 
 
- A Qt version (Linux + Windows) are currently being developed by [olear](https://github.com/olear/audiocurve)
+ A multiplatform Qt version of the bash script are currently being developed by [olear](https://github.com/olear/audiocurve)
 
 #Requirements
 
