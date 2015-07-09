@@ -4,7 +4,6 @@
 
  ![frame](https://cloud.githubusercontent.com/assets/10021906/8601788/af3e4966-266e-11e5-9c08-2ef884d485cd.png)
 
- A plugin for Natron 2.0 can be installed
  
  ![screenshot-2](https://cloud.githubusercontent.com/assets/10021906/8550164/3fd4ae8a-24cf-11e5-9c1d-87d153b72dec.png)
 
