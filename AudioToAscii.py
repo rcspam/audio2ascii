@@ -73,6 +73,9 @@ def paramHasChanged(thisParam, thisNode, thisGroup, app, userEdited):
     audio_file = thisNode.inputFile.get()
     # ascii output file
     ascii_file = thisNode.curveFile.get()
+    # external editing app
+    ext_edit_app = thisNode.editApp.get()
+    ext_edit_app_param = thisNode.editParam.get()
     
     # convert dimension in comprehensive thing for audio2ascii script 
     dim = thisNode.dimEnsion.get()
@@ -82,6 +85,13 @@ def paramHasChanged(thisParam, thisNode, thisGroup, app, userEdited):
         dimension = "y"
     elif dim == 2:
         dimension = "xy" 
+
+    # edit with External app
+    if audio_file and ext_edit_app and thisParam == thisNode.editAudio:
+        os.system(ext_edit_app + " " + ext_edit_app_param + " '" + audio_file + "' &")
+    # doesn't work ?!
+    #else:
+        #app.warningDialog("Audio File", "You need to set a audio editor to edit an audio file")
 
     # Import Curve
     if ascii_file is not None and audio_file is not None and thisParam == thisNode.importCurve:
@@ -155,7 +165,7 @@ def createInstance(app,group):
 
 
     #Create the user-parameters
-    lastNode.userNatron = lastNode.createPageParam("userNatron", "User")
+    lastNode.userNatron = lastNode.createPageParam("userNatron", "Settings")
     param = lastNode.createFileParam("inputFile", "Audio File")
     param.setSequenceEnabled(False)
 
@@ -167,6 +177,62 @@ def createInstance(app,group):
     param.setAddNewLine(True)
     param.setAnimationEnabled(False)
     lastNode.inputFile = param
+    del param
+
+    # Group /
+    param = lastNode.createGroupParam("setEditor", "Editor setting")
+
+    #Add the param to the page
+    lastNode.userNatron.addParam(param)
+
+    #Set param properties
+    param.setHelp("")
+    param.setAddNewLine(True)
+    param.setEvaluateOnChange(False)
+    lastNode.setEditor = param
+    del param
+
+    param = lastNode.createFileParam("editApp", "Audio Editor")
+    param.setSequenceEnabled(False)
+
+    #Add the param to the group, no need to add it to the page
+    lastNode.setEditor.addParam(param)
+
+    #Set param properties
+    param.setHelp("Set the Audio Editor path")
+    param.setAddNewLine(True)
+    param.setAnimationEnabled(False)
+    param.setDefaultValue("audacity")
+    lastNode.editApp = param
+    del param
+
+    param = lastNode.createStringParam("editParam", "Audio editor parameters")
+    param.setType(NatronEngine.StringParam.TypeEnum.eStringTypeDefault)
+    param.setDefaultValue("")
+
+    #Add the param to the group, no need to add it to the page
+    lastNode.setEditor.addParam(param)
+
+    #Set param properties
+    param.setHelp("Set the Audio Editor command line parameters")
+    param.setVisible(True)
+    param.setAddNewLine(False)
+    param.setAnimationEnabled(True)
+    lastNode.editParam = param
+    del param
+    # / Group
+    
+    param = lastNode.createButtonParam("editAudio", "Edit audio File")
+
+    #Add the param to the page
+    lastNode.userNatron.addParam(param)
+
+    #Set param properties
+    param.setHelp("Set an audio editor in the tab 'Editor Setting")
+    param.setAddNewLine(False)
+    param.setPersistant(False)
+    param.setEvaluateOnChange(False)
+    lastNode.editAudio = param
     del param
 
     param = lastNode.createFileParam("curveFile", "Curve File")
@@ -209,7 +275,7 @@ def createInstance(app,group):
     lastNode.dimEnsion = param
     del param
 
-    param = lastNode.createIntParam("framesPerSec", "Frames / sec")
+    param = lastNode.createIntParam("framesPerSec", "Frame Rate")
     param.setDisplayMinimum(0, 0)
     param.setDisplayMaximum(100, 0)
     param.setDefaultValue(24, 0)
