@@ -183,33 +183,46 @@ def createInstance(app,group):
     lastNode.userNatron.addParam(param)
 
     #Set param properties
-    param.setHelp("")
+    param.setHelp("Path to audio file.\nSignificant number of formats are supported including:\nMP3/4, WAV, W64, AIFF, OGG, FLAC.")
     param.setAddNewLine(True)
     param.setAnimationEnabled(False)
     lastNode.inputFile = param
     del param
 
-    # Group /  # will become a tab group
+    param = lastNode.createButtonParam("editAudio", "Edit audio file")
+
+    #Add the param to the page
+    lastNode.userNatron.addParam(param)
+
+    #Set param properties
+    param.setHelp("Audio editor.\nYou can setup it in 'Editor Setting")
+    param.setAddNewLine(False)
+    param.setPersistant(False)
+    param.setEvaluateOnChange(False)
+    lastNode.editAudio = param
+    del param
+
+    # Group /
     param = lastNode.createGroupParam("setEditor", "Editor setting")
 
     #Add the param to the page
     lastNode.userNatron.addParam(param)
 
     #Set param properties
-    param.setHelp("")
+    param.setHelp("Unfold to setup audio editor ")
     param.setAddNewLine(True)
     param.setEvaluateOnChange(False)
     lastNode.setEditor = param
     del param
 
-    param = lastNode.createFileParam("editApp", "Audio Editor")
+    param = lastNode.createFileParam("editApp", "Audio editor")
     param.setSequenceEnabled(False)
 
     #Add the param to the group, no need to add it to the page
     lastNode.setEditor.addParam(param)
 
     #Set param properties
-    param.setHelp("Set the Audio Editor path")
+    param.setHelp("Set the audio editor path")
     param.setAddNewLine(True)
     param.setAnimationEnabled(False)
     param.setDefaultValue("audacity")
@@ -224,26 +237,13 @@ def createInstance(app,group):
     lastNode.setEditor.addParam(param)
 
     #Set param properties
-    param.setHelp("Set the Audio Editor command line parameters")
+    param.setHelp("Set the audio editor command line parameters")
     param.setVisible(True)
     param.setAddNewLine(False)
     param.setAnimationEnabled(True)
     lastNode.editParam = param
     del param
     # / Group
-    
-    param = lastNode.createButtonParam("editAudio", "Edit audio File")
-
-    #Add the param to the page
-    lastNode.userNatron.addParam(param)
-
-    #Set param properties
-    param.setHelp("Set an audio editor in the tab 'Editor Setting")
-    param.setAddNewLine(False)
-    param.setPersistant(False)
-    param.setEvaluateOnChange(False)
-    lastNode.editAudio = param
-    del param
 
     param = lastNode.createFileParam("curveFile", "Curve File")
     param.setSequenceEnabled(False)
@@ -270,7 +270,7 @@ def createInstance(app,group):
     lastNode.userNatron.addParam(param)
 
     #Set param properties
-    param.setHelp("Dimension curve folowing 'x axe', 'y axe' or 'x and y axes'")
+    param.setHelp("Curve dimensions X/Y(Left/Right)")
     param.setAddNewLine(True)
     param.setAnimationEnabled(True)
     options = param.getOptions()
@@ -315,7 +315,7 @@ def createInstance(app,group):
     lastNode.duraTion = param
     del param
 
-    param = lastNode.createIntParam("xHeight", "x curve height")
+    param = lastNode.createIntParam("xHeight", "Height X")
     param.setDisplayMinimum(0, 0)
     param.setDisplayMaximum(500, 0)
     param.setDefaultValue(100, 0)
@@ -324,13 +324,13 @@ def createInstance(app,group):
     lastNode.userNatron.addParam(param)
 
     #Set param properties
-    param.setHelp("Height of x deviation in pixels")
+    param.setHelp("Height of X deviation in pixels")
     param.setAddNewLine(True)
     param.setAnimationEnabled(True)
     lastNode.xHeight = param
     del param
 
-    param = lastNode.createIntParam("yHeight", "y curve height")
+    param = lastNode.createIntParam("yHeight", "Height Y")
     param.setDisplayMinimum(0, 0)
     param.setDisplayMaximum(500, 0)
     param.setDefaultValue(100, 0)
@@ -339,7 +339,7 @@ def createInstance(app,group):
     lastNode.userNatron.addParam(param)
 
     #Set param properties
-    param.setHelp("Height of y deviation in pixels")
+    param.setHelp("Height of Y deviation in pixels")
     param.setAddNewLine(True)
     param.setAnimationEnabled(True)
     lastNode.yHeight = param
@@ -354,13 +354,13 @@ def createInstance(app,group):
     lastNode.userNatron.addParam(param)
 
     #Set param properties
-    param.setHelp("Start the generate curve at this frame on the time")
+    param.setHelp("Start the generate curve at this frame on the timeline")
     param.setAddNewLine(True)
     param.setAnimationEnabled(True)
     lastNode.atFrameNum = param
     del param
 
-    param = lastNode.createButtonParam("currentFrame", "Update to Current Frame")
+    param = lastNode.createButtonParam("currentFrame", "Current Frame")
 
     #Add the param to the page
     lastNode.userNatron.addParam(param)
@@ -379,7 +379,7 @@ def createInstance(app,group):
     lastNode.userNatron.addParam(param)
 
     #Set param properties
-    param.setHelp("Generate curve from parameters above")
+    param.setHelp("Generate curve from parameters")
     param.setAddNewLine(True)
     param.setPersistant(False)
     param.setEvaluateOnChange(False)
@@ -400,7 +400,7 @@ def createInstance(app,group):
     lastNode.userNatron.addParam(param)
 
     #Set param properties
-    param.setHelp("x and y curve generate by the Generate button")
+    param.setHelp("Resultant Curve (keyframes)")
     param.setAddNewLine(True)
     param.setAnimationEnabled(True)
     lastNode.curveIn = param
