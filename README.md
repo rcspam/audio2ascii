@@ -8,7 +8,7 @@
  ![screenshot-2](https://cloud.githubusercontent.com/assets/10021906/8550164/3fd4ae8a-24cf-11e5-9c1d-87d153b72dec.png)
 
 
- A Qt version (Linux + Windows) are currently being developed by [olear](https://github.com/olear/audio2ascii)
+ A Qt version (Linux + Windows) are currently being developed by [olear](https://github.com/olear/audiocurve)
 
 #Requirements
 
@@ -23,9 +23,9 @@
 #Installation / Usage
 
 ```
-$ wget https://github.com/rcspam/audio2ascii/archive/v1.5.tar.gz
-$ tar xvzf audio2ascii-1.5.tar.gz
-$ cd audio2ascii-1.5
+$ wget https://github.com/rcspam/audio2ascii/archive/v1.6.tar.gz
+$ tar xvzf audio2ascii-1.6.tar.gz
+$ cd audio2ascii-1.6
 $ cp ./audio2ascii.sh /somewhere/in/your/path  # must be in your $PATH
 ```
 If you want start audio2ascii from Natron, you should run it with its gui (yad must be installed). To install the plugin AudioToAscii.py and its icon:
