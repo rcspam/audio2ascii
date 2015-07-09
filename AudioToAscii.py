@@ -77,6 +77,14 @@ def paramHasChanged(thisParam, thisNode, thisGroup, app, userEdited):
     ext_edit_app = thisNode.editApp.get()
     ext_edit_app_param = thisNode.editParam.get()
     
+    # Doesn't work until bug in natron is kill
+    #if natron.isUnix():
+        #natron.warningDiallog("Réponse", "Ceci est linux !\n Heureusement !") 
+    
+    # update start at current frame
+    if thisParam == thisNode.currentFrame:
+        thisNode.atFrameNum.set(app.timelineGetTime())
+    
     # convert dimension in comprehensive thing for audio2ascii script 
     dim = thisNode.dimEnsion.get()
     if dim == 0:
@@ -88,10 +96,12 @@ def paramHasChanged(thisParam, thisNode, thisGroup, app, userEdited):
 
     # edit with External app
     if audio_file and ext_edit_app and thisParam == thisNode.editAudio:
+        # Doesn't work until bug in natron is kill
+        #if natron.isLinux():
         os.system(ext_edit_app + " " + ext_edit_app_param + " '" + audio_file + "' &")
-    # doesn't work ?!
+    #  Doesn't work until bug in natron is kill
     #else:
-        #app.warningDialog("Audio File", "You need to set a audio editor to edit an audio file")
+        #natron.warningDialog("Audio File", "You need to set a audio editor to edit an audio file")
 
     # Import Curve
     if ascii_file is not None and audio_file is not None and thisParam == thisNode.importCurve:
@@ -179,7 +189,7 @@ def createInstance(app,group):
     lastNode.inputFile = param
     del param
 
-    # Group /
+    # Group /  # will become a tab group
     param = lastNode.createGroupParam("setEditor", "Editor setting")
 
     #Add the param to the page
@@ -348,6 +358,19 @@ def createInstance(app,group):
     param.setAddNewLine(True)
     param.setAnimationEnabled(True)
     lastNode.atFrameNum = param
+    del param
+
+    param = lastNode.createButtonParam("currentFrame", "Update to Current Frame")
+
+    #Add the param to the page
+    lastNode.userNatron.addParam(param)
+
+    #Set param properties
+    param.setHelp("Update start frame to current frame")
+    param.setAddNewLine(False)
+    param.setPersistant(False)
+    param.setEvaluateOnChange(False)
+    lastNode.currentFrame = param
     del param
 
     param = lastNode.createButtonParam("importCurve", "Generate the curve")
