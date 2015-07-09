@@ -1,7 +1,7 @@
 # audio2ascii
   Convert an audio file to an ascii file readable by the Natron2.0/Nuke curve editor (Linux version, but can be adapted for OSX or other Unix-like).
 
- .[frame](https://cloud.githubusercontent.com/assets/10021906/8601788/af3e4966-266e-11e5-9c08-2ef884d485cd.png)
+ ![frame](https://cloud.githubusercontent.com/assets/10021906/8601788/af3e4966-266e-11e5-9c08-2ef884d485cd.png)
 
  A plugin for Natron 2.0 can be installed
  
