@@ -40,7 +40,7 @@ If you want just add a menu command to the application’s menu-bar, add the fol
 import os
 def audioToAscii():
     os.system("audio2ascii.sh -g &")
-natron.addMenuCommand("Ext-Tools/AudioToAscii","audioToAscii",QtCore.Qt.Key.Key_L,QtCore.Qt.KeyboardModifier.ShiftModifier)
+NatronGui.natron.addMenuCommand("Ext-Tools/AudioToAscii","audioToAscii",QtCore.Qt.Key.Key_L,QtCore.Qt.KeyboardModifier.ShiftModifier)
 ```
 
 #Examples
