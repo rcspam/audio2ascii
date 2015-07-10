@@ -22,9 +22,9 @@ Requirements:
 
 Installation / Usage:
 ====================
-    $ wget https://github.com/rcspam/audio2ascii/archive/v1.6.1.tar.gz
-    $ tar xvzf audio2ascii-1.6.1.tar.gz
-    $ cd audio2ascii-1.6.1
+    $ wget https://github.com/rcspam/audio2ascii/archive/v1.7.tar.gz
+    $ tar xvzf audio2ascii-1.7.tar.gz
+    $ cd audio2ascii-1.7
     $ cp ./audio2ascii.sh /somewhere/in/your/path  # must be in your $PATH
 
   If you want start audio2ascii from Natron, you should run it with its gui (yad must be installed).
