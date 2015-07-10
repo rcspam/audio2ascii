@@ -5,6 +5,7 @@
 import NatronEngine
 
 # extra lib added
+import NatronGui
 import os, time
 from os import *
 
@@ -28,16 +29,24 @@ def getDescription():
     
 # extra defs added
 
+def error_man(titleEM, messEM):
+    NatronGui.natron.warningDialog(titleEM, messEM)
+
 def audioToAscii(audioFileATA, asciiFileATA, dimATA, fpsATA, durationATA, xHeightATA, yHeightATA):
-    # Change the call to audio2ascii executable here	
-    exec_a2a = str("audio2ascii.sh ")
-    # Files to pass
-    files_a2a = str("'" + str(audioFileATA) + "' '" + str(asciiFileATA) + "' ")
-    # Param to pass
-    param_a2a = str(dimATA) + " " +  str(fpsATA) + " " +  str(durationATA) + " " +  str(xHeightATA)  + " " + str(yHeightATA)
-    # Launch audio2ascii
-    ret_a2a = os.system(exec_a2a + files_a2a + param_a2a )
-    return ret_a2a
+    if NatronEngine.natron.isUnix():
+        # Change the call to audio2ascii executable here
+        exec_a2a = str("audio2ascii.sh ")
+    
+        # Files to pass
+        files_a2a = str("'" + str(audioFileATA) + "' '" + str(asciiFileATA) + "' ")
+        # Param to pass
+        param_a2a = str(dimATA) + " " +  str(fpsATA) + " " +  str(durationATA) + " " +  str(xHeightATA)  + " " + str(yHeightATA)
+        # Launch audio2ascii
+        ret_a2a = os.system(exec_a2a + files_a2a + param_a2a )
+        return ret_a2a
+    elif NatronEngine.natron.isWindows():
+        # add executable for windows here
+        error_man("Unix Only", "Sorry, this plugin works only on Linux and Mas Osx !")
 
 def animCurves(thisParam, fileAC, dimAC, fpsAC, durationAC ,frameStartAC):
     # ascii file
@@ -48,7 +57,7 @@ def animCurves(thisParam, fileAC, dimAC, fpsAC, durationAC ,frameStartAC):
     if dimAC == 0:
         # reset x before recalculate
         thisParam.removeAnimation(0)
-        for frameC in range(int(frameStartAC),lineAC + int(frameStartAC)):
+        for frameC in range(int(frameStartAC),lineAC):
             x = asciiAC.readline()
             thisParam.setValueAtTime(float(x), frameC, 0)
     # anim y
@@ -77,10 +86,6 @@ def paramHasChanged(thisParam, thisNode, thisGroup, app, userEdited):
     ext_edit_app = thisNode.editApp.get()
     ext_edit_app_param = thisNode.editParam.get()
     
-    # Doesn't work until bug in natron is kill
-    #if natron.isUnix():
-        #natron.warningDiallog("Réponse", "Ceci est linux !\n Heureusement !") 
-    
     # update start at current frame
     if thisParam == thisNode.currentFrame:
         thisNode.atFrameNum.set(app.timelineGetTime())
@@ -93,24 +98,38 @@ def paramHasChanged(thisParam, thisNode, thisGroup, app, userEdited):
         dimension = "y"
     elif dim == 2:
         dimension = "xy" 
-
+    
     # edit with External app
     if audio_file and ext_edit_app and thisParam == thisNode.editAudio:
-        # Doesn't work until bug in natron is kill
-        #if natron.isLinux():
-        os.system(ext_edit_app + " " + ext_edit_app_param + " '" + audio_file + "' &")
-    #  Doesn't work until bug in natron is kill
-    #else:
-        #natron.warningDialog("Audio File", "You need to set a audio editor to edit an audio file")
-
-    # Import Curve
-    if ascii_file is not None and audio_file is not None and thisParam == thisNode.importCurve:
+        # On Linux and Osx
+        if NatronEngine.natron.isUnix():
+            os.system(ext_edit_app + " " + ext_edit_app_param + " '" + audio_file + "' &")
+        if NatronEngine.natron.isWindows():
+            # add executable for windows here
+            NatronGui.natron.warningDialog("Unix Only", "Sorry, this plugin works only on Linux and Mas Osx !")
+    # no editor path set
+    else:
+        if not ext_edit_app and thisParam == thisNode.editAudio:
+            error_man("Audio Editor", "You need to set a audio editor !\nUnfold group below and fill the editor settings")
+        if not audio_file and thisParam == thisNode.editAudio:
+            error_man("Audio Editor", "You need to set a audio file before edit it !")
+    
+    # Import Curve # add verif param set !!!!
+    if ascii_file and audio_file and thisParam == thisNode.importCurve:
         ret_exec = audioToAscii(audio_file, ascii_file, dimension, thisNode.framesPerSec.get(), thisNode.duraTion.get(), thisNode.xHeight.get(), thisNode.yHeight.get())
         # test and wait end of audio2ascii 
         if ret_exec == 0:
             # calculate animation 
             animCurves(thisNode.curveIn, ascii_file, thisNode.dimEnsion.get(), thisNode.framesPerSec.get(), thisNode.duraTion.get(), thisNode.atFrameNum.get())
-            
+    # Is input and output files set before generate curve
+    if not audio_file and thisParam == thisNode.importCurve:
+        error_man("Audio File", "No Audio File set !\nYou need to set a input audio file path before generate the curves.")
+    if not ascii_file and thisParam == thisNode.importCurve:
+        error_man("Curve File", "No Curve File set !\nYou need to set a output curve file path before generate the curves.")
+    # Reset the curve
+    if thisParam == thisNode.resetCurves:
+        thisNode.curveIn.removeAnimation(0)
+        thisNode.curveIn.removeAnimation(1)
 
 ## / extra defs
 
@@ -195,7 +214,7 @@ def createInstance(app,group):
     lastNode.userNatron.addParam(param)
 
     #Set param properties
-    param.setHelp("Audio editor.\nYou can setup it in 'Editor Setting")
+    param.setHelp("Audio editor.\nYou can setup it in 'Editor Settings")
     param.setAddNewLine(False)
     param.setPersistant(False)
     param.setEvaluateOnChange(False)
@@ -404,6 +423,19 @@ def createInstance(app,group):
     param.setAddNewLine(True)
     param.setAnimationEnabled(True)
     lastNode.curveIn = param
+    del param
+
+    param = lastNode.createButtonParam("resetCurves", "Reset curves")
+
+    #Add the param to the page
+    lastNode.userNatron.addParam(param)
+
+    #Set param properties
+    param.setHelp("Reset the curves to 0")
+    param.setAddNewLine(False)
+    param.setPersistant(False)
+    param.setEvaluateOnChange(False)
+    lastNode.resetCurves = param
     del param
 
     # extra callback added
