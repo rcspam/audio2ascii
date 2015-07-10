@@ -2,7 +2,7 @@
   Natron2.0 python plugin to animate you parameters with waveform from an audio file(mp3, wav,aiff,...).
   It use a bash script that you must have in your $PATH. (This is a Linux version, but it can be easily adapted for OSX or other Unix-like).
 
- ![frame](https://cloud.githubusercontent.com/assets/10021906/8601788/af3e4966-266e-11e5-9c08-2ef884d485cd.png)
+ ![frame](https://cloud.githubusercontent.com/assets/10021906/8617866/52e30a04-2708-11e5-95e7-d6c725a9e698.png)
 
  
  ![screenshot-2](https://cloud.githubusercontent.com/assets/10021906/8550164/3fd4ae8a-24cf-11e5-9c1d-87d153b72dec.png)
