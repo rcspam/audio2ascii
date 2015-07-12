@@ -8,7 +8,7 @@
 
 function usage() {
 	ud=$(basename "$0")
-	echo "Usage: $ud [-g] audioFile file.ascii [x|y|xy] NatronProjectFps duration [CurveHeightInX] [CurveLenghtInY]"
+	echo "Usage: $ud [-g] audioFile file.ascii [x|y|xy] NatronProjectFps durationInFrames [CurveHeightInX] [CurveLenghtInY]"
 	echo "-g : start with GUI"
 	echo "x|y|xy: In which dimension calculate the curve (e.g.: Audio files in stereo can be calculate in xy)"
 	echo "Convert audio file (all supported by 'sox') in an ascii file support by Natron/Nuke"
@@ -37,17 +37,6 @@ function awkmax() {
 		'
 }
 
-function awkx() {
-	echo $line | grep -v ";" | sed 's/ [[:blank:]]//g;s/[[:space:]]/ /g' |\
-		awk -v factx="$factx" -v maxx="$maxx" -v maxdx="$maxdx"\
-			'\
-			{printf "%.10f\n", ($2*factx/maxdx)}\
-			{if ($2 < 0) $2 = -$2}\
-			{if (($2*factx/maxdx) > maxx) maxx = ($2*factx/maxdx)}\
-			{printf "%.2f %.10f", maxx, maxdx}\
-			'
-}
-
 function awkxy() {
 	echo $line | grep -v ";" | sed 's/ [[:blank:]]//g;s/[[:space:]]/ /g' |\
 		awk -v factx="$factx" -v facty="$facty" -v maxx="$maxx" -v maxy="$maxy" -v maxdx="$maxdx"  -v maxdy="$maxdy"\
@@ -63,8 +52,6 @@ function awkxy() {
 
 data="/tmp/data_$$_tmp.dat"
 error_log="/tmp/error_log_sox_$$"
-# abandoned (it was for first versions of natron plugin)
-#natron_curve_file="/tmp/Natron.audio2ascii"
 dim_def="^x!y!xy" # Default: x dimension 
 maxx=0
 maxy=0
@@ -97,14 +84,14 @@ if [ $gui ];then
 				--field="<b>Ascii file </b> to create \::SFL"\
 				--field="<b>Dimensions </b> (on 1 axe\: x or on 2 axes\:xy)\:CB"\
 				--field="<b>Frames/sec </b> (of the Natron project)\:"\
-				--field="<b>Duration</b> (of the curve in secondes)\:"\
+				--field="<b>Duration</b> (of the curve in frames)\:"\
 				--field="<b>x curve height</b> (default is 100):"\
 				--field="<b>y curve height</b> (default is 100):"\
 				"${1}"\
 				"${2:-"/tmp/curve.ascii"}"\
 				"${3:-"${dim_def}"}"\
 				"${4:-24}"\
-				"${5:-10}"\
+				"${5:-240}"\
 				"${6:-100}"\
 				"${7:-100}" > "${YAD_TMP}" 2>/dev/null 
 	[[ $? = 252 || $? = 1 ]] && rm "${YAD_TMP}" && exit 1
@@ -132,9 +119,10 @@ fi
 
 # convert audio to .dat 
 srate=$(sox --i "${in}" 2>${error_log} | grep "^Sample Rate" | awk '{print $4}')
-echo CMD: sox "${in}" -r ${fps} "${data}" trim 0 ${dur}
+end=$(echo "${dur}/${fps}" | bc -l)
+echo CMD: sox "${in}" -r ${fps} "${data}" trim 0 ${end}
 echo -n "Converting $in to Data file with SampleRate $fps (original: $srate)..."
-sox "${in}" -r ${fps} "${data}" trim 0 ${dur} 2>${error_log} || error 1
+sox "${in}" -r ${fps} "${data}" trim 0 ${end} 2>${error_log} || error 1
 echo "Done"
 
 # Search the dry maximum variation in x and in y
@@ -156,16 +144,18 @@ while read line
 do
 	if [ "$dim" == "x" ];then
 		# x
-		read dimx maxx maxdx_tmp maxdy_tmp <<< $(awkx) 
-		[[ -n $dimx ]] && nr=$((nr+1)) && echo "$dimx" # $dimx test to avoid empty lines
+		# read dimx maxx maxdx_tmp maxdy_tmp <<< $(awkx)
+		read dimx dimy maxx maxdx_tmp maxdy_tmp <<< $(awkxy) 
+		[[ -n $dimx ]] && nr=$((nr+1)) && echo "${dimx}_0.00" # $dimx test to avoid empty lines
 		
 		# gui info
 		dim_def="^x!y!xy"
 		print_dim="\t\t\tx:<b> $maxx</b> ($maxdx_tmp)"
 	elif [ "$dim" == "y" ];then
 		# y
+		#read dimy maxx maxdx_tmp maxy maxdy_tmp <<< $(awkxy)
 		read dimx dimy maxx maxdx_tmp maxy maxdy_tmp <<< $(awkxy)
-		[[ -n $dimx ]] && nr=$((nr+1)) && echo "$dimy" # $dimx test to avoid empty lines
+		[[ -n $dimx ]] && nr=$((nr+1)) && echo "0.00_${dimy}" # $dimx test to avoid empty lines
 		
 		# gui info
 		dim_def="x!^y!xy"
@@ -181,9 +171,6 @@ do
 	fi
 done < "${data}" > "${out}"
 echo "Done"
-# abandoned (it was for first versions of natron plugin)
-# Create Natron "communication" file  
-# echo "${out}" "${dim}" "${fps}" "${dur}"> "${natron_curve_file}"
 
 # Result
 # result non GUI
@@ -191,11 +178,11 @@ print_x="X: ${maxx}(${maxdx_tmp})"
 [[ "$dim" == "y" ]] && print_x="X: 0()"
 print_y="\t\t      Y: ${maxy}(${maxdy_tmp})"
 echo -e "The maximum varation: ${print_x}\n${print_y}" 
-echo -e "\t\t      $nr keys in $(($nr/$fps)) seconds  ($fps frames/s)"
+echo -e "\t\t      $nr keys in $(LANG=C printf "%.2f" $end) seconds  ($fps frames/s)"
 #GUI
 [[ $gui ]] && { 
 				print_head="\n\t\t\t\t<b><u>Maximum variations:</u></b>\n"
-				print_nbkey="\t\t\t<b>$nr</b> keys in <b>$(($nr/$fps))</b> seconds  ($fps frames/s)"
+				print_nbkey="\t\t\t<b>$nr</b> keys in <b>$(LANG=C printf "%.2f" $end) </b> seconds  ($fps frames/s)"
 				print_extra="\t<span color='grey'><small>\t\tInside brakets: maximum before scaling</small></span>\n"
 				print_out="Result in <b>${out}</b>:"
 				print_info="${print_head}\n${print_dim}\n${print_nbkey}\n${print_extra}\n${print_out}"
