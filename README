@@ -38,4 +38,4 @@ add the following lines in your $HOME/.local/share/INRIA/Natron/Plugins/init.py
 (create init.py if doesn't exist):
   def audioToAscii():
       os.system("audio2ascii.sh -g &")
-  natron.addMenuCommand("Ext-Tools/AudioToAscii","audioToAscii",QtCore.Qt.Key.Key_L,QtCore.Qt.KeyboardModifier.ShiftModifier)
+  NatronGui.natron.addMenuCommand("Ext-Tools/AudioToAscii","audioToAscii",QtCore.Qt.Key.Key_L,QtCore.Qt.KeyboardModifier.ShiftModifier)
