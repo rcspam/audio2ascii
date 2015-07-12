@@ -6,6 +6,7 @@ import NatronEngine
 
 # extra lib added
 import NatronGui
+
 import os, time
 from os import *
 
@@ -58,17 +59,17 @@ def animCurves(thisParam, fileAC, dimAC, fpsAC, durationAC ,frameStartAC):
         # reset x before recalculate
         thisParam.removeAnimation(0)
         for frameC in range(int(frameStartAC),lineAC):
-            x = asciiAC.readline()
+            x, y = asciiAC.readline().split ("_")
             thisParam.setValueAtTime(float(x), frameC, 0)
     # anim y
     elif dimAC == 1:
         # reset y before recalculate
         thisParam.removeAnimation(1)
         for frameC in range(int(frameStartAC),lineAC):
-            y = asciiAC.readline()
+            x, y = asciiAC.readline().split ("_")
             thisParam.setValueAtTime(float(y), frameC, 1)
     # anim yx
-    else:
+    elif dimAC == 2:
         # reset x and y before recalculate
         thisParam.removeAnimation(0)
         thisParam.removeAnimation(1)
@@ -76,6 +77,8 @@ def animCurves(thisParam, fileAC, dimAC, fpsAC, durationAC ,frameStartAC):
             x, y = asciiAC.readline().split ("_")
             thisParam.setValueAtTime(float(x), frameC, 0)
             thisParam.setValueAtTime(float(y), frameC, 1)
+
+    
 
 def paramHasChanged(thisParam, thisNode, thisGroup, app, userEdited):
     # audio input file
@@ -131,6 +134,32 @@ def paramHasChanged(thisParam, thisNode, thisGroup, app, userEdited):
         thisNode.curveIn.removeAnimation(0)
         thisNode.curveIn.removeAnimation(1)
 
+    #TEST PREVIEW linux only
+    # play preview
+    if thisParam == thisNode.playSync:
+        if audio_file:
+            # stop viewer & Mplayer if playing
+            os.system("killall mplayer >/dev/null 2>&1 ") # Very sad !
+            # Some init dor the Viewer
+            app.pane1.Viewer1.setPlaybackMode(NatronEngine.Natron.PlaybackModeEnum(0))
+            app.pane1.Viewer1.setFrameRange(thisNode.atFrameNum.get(), thisNode.duraTion.get())
+            # calculate Mplayer duration loop
+            duration_loop = thisNode.duraTion.get() / thisNode.framesPerSec.get()
+            # start Mplayer
+            os.system("mplayer  " + str(audio_file) + " --endpos=" + str(duration_loop) + " --loop=0 >/dev/null 2>&1 &")
+            app.pane1.Viewer1.pause()
+            app.pane1.Viewer1.seek(thisNode.atFrameNum.get())
+            app.pane1.Viewer1.startForward()
+        else:
+            error_man("Audio Editor", "You need to set a audio file before preview !")
+    # Stop preview
+    if thisParam == thisNode.stopSync:
+        if audio_file:
+            os.system("killall mplayer >/dev/null 2>&1 ")  # Very sad !
+            app.pane1.Viewer1.pause()
+        else:
+            error_man("Audio Editor", "You need to set a audio file before preview !")
+
 ## / extra defs
 
 def createInstance(app,group):
@@ -156,7 +185,6 @@ def createInstance(app,group):
         del param
 
     del lastNode
-
 
 
     lastNode = app.createNode("fr.inria.built-in.Input", 1, group)
@@ -321,14 +349,14 @@ def createInstance(app,group):
 
     param = lastNode.createIntParam("duraTion", "Duration")
     param.setDisplayMinimum(0, 0)
-    param.setDisplayMaximum(200, 0)
-    param.setDefaultValue(3, 0)
+    param.setDisplayMaximum(500, 0)
+    param.setDefaultValue(240, 0)
 
     #Add the param to the page
     lastNode.userNatron.addParam(param)
 
     #Set param properties
-    param.setHelp("Duration of the curve in seconds")
+    param.setHelp("Duration of the curve in frames")
     param.setAddNewLine(True)
     param.setAnimationEnabled(True)
     lastNode.duraTion = param
@@ -438,9 +466,65 @@ def createInstance(app,group):
     lastNode.resetCurves = param
     del param
 
+    # ONLY linux (test preview Viewer/Audio)
+    if NatronEngine.natron.isLinux():
+        param = lastNode.createStringParam("viewerAudio", "Preview Viewer/Audio")
+        param.setType(NatronEngine.StringParam.TypeEnum.eStringTypeLabel)
+        
+        #Add the param to the page
+        lastNode.userNatron.addParam(param)
+        
+        #Set param properties
+        param.setHelp("")
+        param.setAddNewLine(True)
+        param.setEvaluateOnChange(False)
+        param.setAnimationEnabled(False)
+        lastNode.viewerAudio = param
+        del param
+        
+        param = lastNode.createButtonParam("playSync", "\u25b6")
+
+        #Add the param to the page
+        lastNode.userNatron.addParam(param)
+        
+        #Set param properties
+        param.setHelp("Start preview  Viewer/Audio\nFor a better sync, Play/Cache the images in the viewer before preview")
+        param.setAddNewLine(True)
+        param.setPersistant(False)
+        param.setEvaluateOnChange(False)
+        lastNode.playSync = param
+        del param
+        
+        param = lastNode.createButtonParam("stopSync", "\u25a0")
+
+        #Add the param to the page
+        lastNode.userNatron.addParam(param)
+
+        #Set param properties
+        param.setHelp("Stop preview Viewer/Audio")
+        param.setAddNewLine(False)
+        param.setPersistant(False)
+        param.setEvaluateOnChange(False)
+        lastNode.stopSync = param
+        del param
+        
+        param = lastNode.createStringParam("betterPreview", "It's better to Play/Cache the images\nin the viewer before start the preview")
+        param.setType(NatronEngine.StringParam.TypeEnum.eStringTypeLabel)
+
+        #Add the param to the page
+        lastNode.userNatron.addParam(param)
+
+        #Set param properties
+        param.setHelp("")
+        param.setAddNewLine(False)
+        param.setEvaluateOnChange(False)
+        param.setAnimationEnabled(False)
+        lastNode.betterPreview = param
+        del param
+
     # extra callback added
     app.AudioToAscii1.onParamChanged.set("AudioToAscii.paramHasChanged")    
-
+    
     #Refresh the GUI with the newly created parameters
     lastNode.refreshUserParamsGUI()
     del lastNode
