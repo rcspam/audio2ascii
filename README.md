@@ -3,10 +3,10 @@
   It use a bash script that you must have in your $PATH. (This is a Linux version, but it can be easily adapted for OSX or other Unix-like).
   [Here is a Demo/tuto](https://www.youtube.com/watch?v=koagSOPnsVw)
 
- ![frame](https://cloud.githubusercontent.com/assets/10021906/8617866/52e30a04-2708-11e5-95e7-d6c725a9e698.png)
+ ![frame](https://cloud.githubusercontent.com/assets/10021906/8639016/ce766e70-28cc-11e5-9c19-486f64b71992.png)
 
  
- ![screenshot-2](https://cloud.githubusercontent.com/assets/10021906/8550164/3fd4ae8a-24cf-11e5-9c1d-87d153b72dec.png)
+ ![screenshot-2](https://cloud.githubusercontent.com/assets/10021906/8639230/a3a4e7f6-28d3-11e5-96e1-3e0490e6b9fe.png)
 
 
  A multiplatform Qt version of the bash script are currently being developed by [olear](https://github.com/olear/audiocurve)
