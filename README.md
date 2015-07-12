@@ -1,6 +1,7 @@
 # audio2ascii
   Natron2.0 python plugin to animate you parameters with waveform from an audio file(mp3, wav,aiff,...).
   It use a bash script that you must have in your $PATH. (This is a Linux version, but it can be easily adapted for OSX or other Unix-like).
+  [Here is a Demo/tuto](https://www.youtube.com/watch?v=koagSOPnsVw)
 
  ![frame](https://cloud.githubusercontent.com/assets/10021906/8617866/52e30a04-2708-11e5-95e7-d6c725a9e698.png)
 
@@ -23,9 +24,9 @@
 #Installation / Usage
 
 ```
-$ wget https://github.com/rcspam/audio2ascii/archive/v1.7.tar.gz
-$ tar xvzf audio2ascii-1.7.tar.gz
-$ cd audio2ascii-1.7
+$ wget https://github.com/rcspam/audio2ascii/archive/v1.8.tar.gz
+$ tar xvzf audio2ascii-1.8.tar.gz
+$ cd audio2ascii-1.8
 $ cp ./audio2ascii.sh /somewhere/in/your/path  # must be in your $PATH
 ```
 If you want start audio2ascii from Natron, you should run it with its gui (yad must be installed). To install the plugin AudioToAscii.py and its icon:
