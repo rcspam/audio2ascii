@@ -1,32 +1,49 @@
 # audio2ascii
   Natron2.0 python plugin to animate you parameters with waveform from an audio file(mp3, wav,aiff,...).
-  It use a bash script that you must have in your $PATH. (This is a Linux version, but it can be easily adapted for OSX or other Unix-like).
+  It use a bash script that you must have in your $PATH. (Only Linux and Mac Osx).
   [Here is a Demo/tuto](https://www.youtube.com/watch?v=koagSOPnsVw)
 
  ![frame](https://cloud.githubusercontent.com/assets/10021906/8639016/ce766e70-28cc-11e5-9c19-486f64b71992.png)
 
- 
+
  ![screenshot-2](https://cloud.githubusercontent.com/assets/10021906/8639230/a3a4e7f6-28d3-11e5-96e1-3e0490e6b9fe.png)
 
 
- A multiplatform Qt version of the bash script are currently being developed by [olear](https://github.com/olear/audiocurve)
+ For Windows users, a multiplatform Qt version of the bash script are currently being developed by [olear](https://github.com/olear/audiocurve)
 
 #Requirements
 
- * [Sox](http://sox.sourceforge.net/): **sudo apt-get install sox** or  **sudo yum install sox**.
+ * [Sox](http://sox.sourceforge.net/):
 
-    For support more audio formats than 'wav': **sudo apt-get install libsox-fmt-all** (debian).
+    - <u>Debian/Ubuntu:</u> **sudo apt-get install sox** or  **sudo yum install sox**. For support more audio formats than 'wav': **sudo apt-get install libsox-fmt-all** (debian).
 
-    Fedora: for mp3 support for sox you can read [this](https://unix.stackexchange.com/questions/98524/sox-returns-an-error-when-i-try-to-handle-mp3-files)
+    - <u>Fedora:</u> for mp3 support for sox you can read [this](https://unix.stackexchange.com/questions/98524/sox-returns-an-error-when-i-try-to-handle-mp3-files)
 
- * [Yad](http://sourceforge.net/projects/yad-dialog): If you want a gui: **sudo apt-get install yad** ; **sudo yum install yad**
+    - <u>Mac OSX:</u> **sudo port install sox** (After have installed [Xcode](https://developer.apple.com/download) and [Command Line Tools](https://developer.apple.com/download))
+
+ * [Mplayer](http://mplayerhq.hu/design7/news.html):
+
+    - <u>Debian/Ubuntu:</u> **sudo apt-get install mplayer or sudo yum install mplayer**
+
+    - <u>Mac OSX:</u> **sudo port install mplayer**
+
+ * <u>[Gawk](http://www.gnu.org/software/gawk)</u> (Mac OSX users only):
+
+     - **sudo port install gawk**</u>
+     
+
+ * [Yad](http://sourceforge.net/projects/yad-dialog) (optional, stand alone GUI on Linux):
+
+    - <u>Debian/Ubuntu:</u> **sudo apt-get install yad**
+
+    - <u>Fedora:</u>**sudo yum install yad**
 
 #Installation / Usage
 
 ```
-$ wget https://github.com/rcspam/audio2ascii/archive/v1.8.tar.gz
-$ tar xvzf audio2ascii-1.8.tar.gz
-$ cd audio2ascii-1.8
+$ wget https://github.com/rcspam/audio2ascii/archive/v1.9.tar.gz
+$ tar xvzf audio2ascii-1.9.tar.gz
+$ cd audio2ascii-1.9
 $ cp ./audio2ascii.sh /somewhere/in/your/path  # must be in your $PATH
 ```
 If you want start audio2ascii from Natron, you should run it with its gui (yad must be installed). To install the plugin AudioToAscii.py and its icon:
