@@ -28,7 +28,7 @@
 
     - <u>Mac OSX:</u> **sudo port install ffmpeg**
 
- * <u>[gawk](http://www.gnu.org/software/gawk)</u> (Mac OSX users only, awk doen't support floats):
+ * <u>[gawk](http://www.gnu.org/software/gawk)</u> (Mac OSX users only, awk doesn't support floats):
 
      - **sudo port install gawk**</u>
      
