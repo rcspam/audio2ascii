@@ -134,19 +134,18 @@ def paramHasChanged(thisParam, thisNode, thisGroup, app, userEdited):
         thisNode.curveIn.removeAnimation(0)
         thisNode.curveIn.removeAnimation(1)
 
-    #TEST PREVIEW linux only
     # play preview
     if thisParam == thisNode.playSync:
         if audio_file:
-            # stop viewer & Mplayer if playing
-            os.system("killall mplayer >/dev/null 2>&1 ") # Very sad !
+            # stop viewer & ffplay if playing
+            os.system("killall ffplay >/dev/null 2>&1 ") # Very sad !
             # Some init dor the Viewer
             app.pane1.Viewer1.setPlaybackMode(NatronEngine.Natron.PlaybackModeEnum(0))
             app.pane1.Viewer1.setFrameRange(thisNode.atFrameNum.get(), thisNode.duraTion.get())
             # calculate Mplayer duration loop
             duration_loop = thisNode.duraTion.get() / thisNode.framesPerSec.get()
             # start Mplayer
-            os.system("mplayer  " + str(audio_file) + " --endpos=" + str(duration_loop) + " --loop=0 >/dev/null 2>&1 &")
+            os.system("ffplay -nodisp " + str(audio_file) + " -t " + str(duration_loop) + " -loop 0 >/dev/null 2>&1 &")
             app.pane1.Viewer1.pause()
             app.pane1.Viewer1.seek(thisNode.atFrameNum.get())
             app.pane1.Viewer1.startForward()
@@ -155,7 +154,7 @@ def paramHasChanged(thisParam, thisNode, thisGroup, app, userEdited):
     # Stop preview
     if thisParam == thisNode.stopSync:
         if audio_file:
-            os.system("killall mplayer >/dev/null 2>&1 ")  # Very sad !
+            os.system("killall ffplay >/dev/null 2>&1 ")  # Very sad !
             app.pane1.Viewer1.pause()
         else:
             error_man("Audio Editor", "You need to set a audio file before preview !")
