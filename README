@@ -1,9 +1,9 @@
-audio2ascii:
+audio2ascii: (Only Linux and Mac Osx)
 ===========
 
 Natron2.0 python plugin to animate you parameters with waveform from an audio file(mp3, wav,aiff,...).
-It use a bash script that you must have in your $PATH.
-(This is a Linux version, but it can be easily adapted for OSX or other Unix-like).
+It use a bash script(audio2ascii.sh), sox and ffplay(from ffpmeg), you must have them in your
+environment PATH(for OSX the place to set it depend of your version
 
 A multiplatform Qt version of the bash script are currently being developed by @olear at:
 https://github.com/olear/audiocurve
@@ -12,7 +12,7 @@ https://github.com/olear/audiocurve
 Requirements:
 ============
 
--   Sox:
+-   sox:
 
        sudo apt-get install sox or sudo yum install sox.(Debian / Fedora)
 
@@ -23,15 +23,15 @@ Requirements:
 
        Mac OSX: sudo port install sox (After have installed Xcode and Command Line Tools)
 
--   Mplayer
+-   ffmpeg
 
-       Debian/Ubuntu: sudo apt-get install mplayer or sudo yum install mplayer
+       Debian/Ubuntu: sudo apt-get install ffmpeg or sudo yum install ffmpeg
 
-       Mac OSX: sudo port install mplayer
+       Mac OSX: sudo port install ffmpeg
 
--   Gawk (OSX users only): sudo port install gawk
+-   gawk (OSX users only): sudo port install gawk
 
--   Yad (optional, stand alone GUI on Linux):
+-   yad (optional, stand alone GUI on Linux):
 
       Debian/Ubuntu: sudo apt-get install yad
 
