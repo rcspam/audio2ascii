@@ -29,7 +29,7 @@ Requirements:
 
        Mac OSX: sudo port install ffmpeg
 
--   gawk (OSX users only): sudo port install gawk
+-   gawk (OSX users only, awk doesn't support floats): sudo port install gawk
 
 -   yad (optional, stand alone GUI on Linux):
 
