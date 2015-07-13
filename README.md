@@ -1,6 +1,7 @@
-# audio2ascii
+# audio2ascii (Only Linux and Mac Osx)
   Natron2.0 python plugin to animate you parameters with waveform from an audio file(mp3, wav,aiff,...).
-  It use a bash script that you must have in your $PATH. (Only Linux and Mac Osx).
+  It use a bash script(audio2ascii.sh), sox and ffplay(from ffpmeg), you must have them in your environment PATH(for OSX the place to set it depend of your version).
+  
   [Here is a Demo/tuto](https://www.youtube.com/watch?v=koagSOPnsVw)
 
  ![frame](https://cloud.githubusercontent.com/assets/10021906/8639016/ce766e70-28cc-11e5-9c19-486f64b71992.png)
@@ -13,7 +14,7 @@
 
 #Requirements
 
- * [Sox](http://sox.sourceforge.net/):
+ * [sox](http://sox.sourceforge.net/):
 
     - <u>Debian/Ubuntu:</u> **sudo apt-get install sox** or  **sudo yum install sox**. For support more audio formats than 'wav': **sudo apt-get install libsox-fmt-all** (debian).
 
@@ -21,18 +22,18 @@
 
     - <u>Mac OSX:</u> **sudo port install sox** (After have installed [Xcode](https://developer.apple.com/download) and [Command Line Tools](https://developer.apple.com/download))
 
- * [Mplayer](http://mplayerhq.hu/design7/news.html):
+ * [ffmpeg](http://www.ffmpeg.org/):
 
-    - <u>Debian/Ubuntu:</u> **sudo apt-get install mplayer or sudo yum install mplayer**
+    - <u>Debian/Ubuntu:</u> **sudo apt-get install ffmpeg or sudo yum install ffmpeg**
 
-    - <u>Mac OSX:</u> **sudo port install mplayer**
+    - <u>Mac OSX:</u> **sudo port install ffmpeg**
 
- * <u>[Gawk](http://www.gnu.org/software/gawk)</u> (Mac OSX users only):
+ * <u>[gawk](http://www.gnu.org/software/gawk)</u> (Mac OSX users only):
 
      - **sudo port install gawk**</u>
      
 
- * [Yad](http://sourceforge.net/projects/yad-dialog) (optional, stand alone GUI on Linux):
+ * [yad](http://sourceforge.net/projects/yad-dialog) (optional, stand alone GUI on Linux):
 
     - <u>Debian/Ubuntu:</u> **sudo apt-get install yad**
 
