@@ -24,7 +24,7 @@
 
  * [ffmpeg](http://www.ffmpeg.org/):
 
-    - <u>Debian/Ubuntu:</u> **sudo apt-get install ffmpeg or sudo yum install ffmpeg**
+    - <u>Debian/Ubuntu:</u> **sudo apt-get install ffmpeg** or **sudo yum install ffmpeg**
 
     - <u>Mac OSX:</u> **sudo port install ffmpeg**
 
