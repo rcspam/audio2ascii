@@ -14,6 +14,7 @@ function usage() {
 	echo "x|y|xy: In which dimension calculate the curve (e.g.: Audio files in stereo can be calculate in xy)"
 	echo "Convert audio file (all supported by 'sox') in an ascii file support by Natron/Nuke"
 	echo "'sox' must be installed"
+	[[ $osx ]] && echo "'gawk' must be installed"
 	echo "Only for GUI:'yad' must be installed"
 	exit
 }
@@ -28,7 +29,7 @@ function error() {
 
 function awkmax() {
 	echo $line | grep -v ";" | sed 's/ [[:blank:]]//g;s/[[:space:]]/ /g' |\
-		awk -v maxdx="$maxdx" -v maxdy="$maxdy"\
+		gawk -v maxdx="$maxdx" -v maxdy="$maxdy"\
 		'\
 		{if ($2 < 0) $2 = -$2}\
 		{if (($2) > maxdx) maxdx = ($2)}\
@@ -40,7 +41,7 @@ function awkmax() {
 
 function awkxy() {
 	echo $line | grep -v ";" | sed 's/ [[:blank:]]//g;s/[[:space:]]/ /g' |\
-		awk -v factx="$factx" -v facty="$facty" -v maxx="$maxx" -v maxy="$maxy" -v maxdx="$maxdx"  -v maxdy="$maxdy"\
+		gawk -v factx="$factx" -v facty="$facty" -v maxx="$maxx" -v maxy="$maxy" -v maxdx="$maxdx"  -v maxdy="$maxdy"\
 			'\
 			{printf "%.10f %.10f\n", ($2*factx/maxdx), ($3*facty/maxdy)}\
 			{if ($2 < 0) $2 = -$2}\
