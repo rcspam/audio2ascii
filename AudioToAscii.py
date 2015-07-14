@@ -465,8 +465,8 @@ def createInstance(app,group):
     lastNode.resetCurves = param
     del param
 
-    # ONLY linux (test preview Viewer/Audio)
-    if NatronEngine.natron.isLinux():
+    # ONLY Unix (test preview Viewer/Audio)
+    if NatronEngine.natron.isUnix():
         param = lastNode.createStringParam("viewerAudio", "Preview Viewer/Audio")
         param.setType(NatronEngine.StringParam.TypeEnum.eStringTypeLabel)
         
