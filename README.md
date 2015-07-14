@@ -1,6 +1,6 @@
 # audio2ascii (Only Linux and Mac Osx)
-  Natron2.0 python plugin to animate you parameters with waveform from an audio file(mp3, wav,aiff,...).
-  It use a bash script(audio2ascii.sh), sox and ffplay(from ffpmeg), you must have them in your environment PATH(for OSX the place to set it depend of your version).
+  Natron2.0 python plugin to animate you parameters with waveform from an audio file(mp3, wav,aiff,...). Then, it try to preview audio while viewer playing. Can be usefull until [the basic sound support](https://github.com/MrKepzie/Natron/issues/76#issuecomment-120059396) in future Natron versions (>2.0).   
+  The plugin use a bash script(audio2ascii.sh), sox and ffplay(from ffpmeg), you must have them in your environment PATH(for OSX the place to set it depend of your version).
   
   [Here is a Demo/tuto](https://www.youtube.com/watch?v=koagSOPnsVw)
 
