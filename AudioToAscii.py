@@ -6,7 +6,7 @@ import NatronEngine
 
 # extra lib added
 import NatronGui
-import os, time
+import os, time, tempfile
 from os import *
 
 def getPluginID():
@@ -32,8 +32,8 @@ def getDescription():
 def error_man(titleEM, messEM):
     NatronGui.natron.warningDialog(titleEM, messEM)
 
-def kill_pid_player():
-    pid_file_kpp = open("/tmp/pid_natron_ffplay", "r")
+def kill_pid_player(tfKPP):
+    pid_file_kpp = open(tfKPP, "r")
     pid = pid_file_kpp.readline()
     os.system("kill " + pid)
     pid_file_kpp.close()
@@ -43,7 +43,7 @@ def audioToAscii(audioFileATA, asciiFileATA, dimATA, fpsATA, durationATA, xHeigh
         if NatronEngine.natron.isLinux():
             audio2ascii_dir = "$HOME/.local/share/INRIA/Natron/Plugins/"
         elif NatronEngine.natron.isMacOSX():
-            audio2ascii_dir = "$HOME/Library/Application Support/INRIA/Natron/Plugins/"
+            audio2ascii_dir = "$HOME/Library/Application\ Support/INRIA/Natron/Plugins/"
         exec_a2a = str(audio2ascii_dir + "audio2ascii.sh ")
         
         # Files to pass
@@ -98,6 +98,8 @@ def paramHasChanged(thisParam, thisNode, thisGroup, app, userEdited):
     ext_edit_app = thisNode.editApp.get()
     ext_edit_app_param = thisNode.editParam.get()
     
+    tmp_file = thisNode.tmpFile.get()
+    
     # update start at current frame
     if thisParam == thisNode.currentFrame:
         thisNode.atFrameNum.set(app.timelineGetTime())
@@ -145,16 +147,16 @@ def paramHasChanged(thisParam, thisNode, thisGroup, app, userEdited):
 
     # play preview
     if thisParam == thisNode.playSync:
-        if audio_file:
+        if audio_file and tmp_file:
             # stop viewer & ffplay if playing
-            kill_pid_player()
+            kill_pid_player(tmp_file)
             # Some init dor the Viewer
             app.pane1.Viewer1.setPlaybackMode(NatronEngine.Natron.PlaybackModeEnum(0))
             app.pane1.Viewer1.setFrameRange(thisNode.atFrameNum.get(), thisNode.duraTion.get() + thisNode.atFrameNum.get())
             # calculate ffplay duration loop
             duration_loop = thisNode.duraTion.get() / thisNode.framesPerSec.get()
             # start ffplay
-            os.system("ffplay -nodisp " + str(audio_file) + " -t " + str(duration_loop) + " -loop 0 & echo $! > /tmp/pid_natron_ffplay")
+            os.system("ffplay -nodisp " + str(audio_file) + " -t " + str(duration_loop) + " -loop 0  & echo $! >" + tmp_file)
             app.pane1.Viewer1.pause()
             app.pane1.Viewer1.seek(thisNode.atFrameNum.get())
             app.pane1.Viewer1.startForward()
@@ -162,8 +164,8 @@ def paramHasChanged(thisParam, thisNode, thisGroup, app, userEdited):
             error_man("Audio Editor", "You need to set a audio file before preview !")
     # Stop preview
     if thisParam == thisNode.stopSync:
-        if audio_file:
-            kill_pid_player()
+        if audio_file and tmp_file:
+            kill_pid_player(tmp_file)
             app.pane1.Viewer1.pause()
         else:
             error_man("Audio Editor", "You need to set a audio file before preview !")
@@ -528,6 +530,14 @@ def createInstance(app,group):
         param.setEvaluateOnChange(False)
         param.setAnimationEnabled(False)
         lastNode.betterPreview = param
+        del param
+        
+        # Create a tempfile within "ffplay pid"
+        param = lastNode.createFileParam("tmpFile", "Temp File")
+        param.setVisible(False)
+        tf = tempfile.NamedTemporaryFile(delete=False)
+        param.setDefaultValue(tf.name)
+        lastNode.tmpFile = param
         del param
 
     # extra callback added
