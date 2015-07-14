@@ -11,7 +11,7 @@ function usage() {
 	echo "Usage: $ud [-g] audioFile file.ascii [x|y|xy] NatronProjectFps durationInFrames [CurveHeightInX] [CurveLenghtInY]"
 	echo "Version $version for $os"
 	echo "-g : start with GUI"
-	echo "x|y|xy: In which dimension calculate the curve (e.g.: Audio files in stereo can be calculate in xy)"
+	echo "x|y|xy: In which dimension calculate the curve (e.g.: Stereo Audio files can be calculate in xy)"
 	echo "Convert audio file (all supported by 'sox') in an ascii file support by Natron/Nuke"
 	echo "'sox' must be installed"
 	[[ $osx ]] && echo "'gawk' must be installed"
@@ -52,7 +52,7 @@ function awkxy() {
 			'
 }
 
-version="1.8"
+version="1.9"
 data="/tmp/data_$$_tmp.dat"
 error_log="/tmp/error_log_sox_$$"
 dim_def="^x!y!xy" # Default: x dimension 
@@ -65,15 +65,20 @@ os=$(uname)
 [[ "$os" =~ "Darwin" ]] && osx=1 && linux=0
 [[ "$os" =~ "Linux" ]] && osx=0 && linux=1
 
-if ! which sox >/dev/null;then
+if [[ ! $(which sox) ]];then
 	echo "$0 require 'sox' which is not installed"
+	exit 1  
+fi
+
+if [[ ! $(which ffplay) ]];then
+	echo "$0 require 'ffplay (ffmpeg)' which is not installed"
 	exit 1  
 fi
 
 if [[ "$1" == "-g" && $linux ]]; then
 	gui=1
 	shift
-	if ! which yad >/dev/null;then
+	if [[ ! $(which yad) ]];then
 		echo "Gui fo $0 require 'yad' which is not installed"
 		exit 1
 	fi
