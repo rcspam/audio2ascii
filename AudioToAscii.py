@@ -6,7 +6,6 @@ import NatronEngine
 
 # extra lib added
 import NatronGui
-
 import os, time
 from os import *
 
@@ -33,11 +32,20 @@ def getDescription():
 def error_man(titleEM, messEM):
     NatronGui.natron.warningDialog(titleEM, messEM)
 
+def kill_pid_player():
+    pid_file_kpp = open("/tmp/pid_natron_ffplay", "r")
+    pid = pid_file_kpp.readline()
+    os.system("kill " + pid)
+    pid_file_kpp.close()
+
 def audioToAscii(audioFileATA, asciiFileATA, dimATA, fpsATA, durationATA, xHeightATA, yHeightATA):
     if NatronEngine.natron.isUnix():
-        # Change the call to audio2ascii executable here
-        exec_a2a = str("audio2ascii.sh ")
-    
+        if NatronEngine.natron.isLinux():
+            audio2ascii_dir = "$HOME/.local/share/INRIA/Natron/Plugins/"
+        elif NatronEngine.natron.isMacOSX():
+            audio2ascii_dir = "$HOME/Library/Application Support/INRIA/Natron/Plugins/"
+        exec_a2a = str(audio2ascii_dir + "audio2ascii.sh ")
+        
         # Files to pass
         files_a2a = str("'" + str(audioFileATA) + "' '" + str(asciiFileATA) + "' ")
         # Param to pass
@@ -77,6 +85,7 @@ def animCurves(thisParam, fileAC, dimAC, fpsAC, durationAC ,frameStartAC):
             x, y = asciiAC.readline().split ("_")
             thisParam.setValueAtTime(float(x), frameC, 0)
             thisParam.setValueAtTime(float(y), frameC, 1)
+    asciiAC.close()
 
     
 
@@ -138,14 +147,14 @@ def paramHasChanged(thisParam, thisNode, thisGroup, app, userEdited):
     if thisParam == thisNode.playSync:
         if audio_file:
             # stop viewer & ffplay if playing
-            os.system("killall ffplay >/dev/null 2>&1 ") # Very sad !
+            kill_pid_player()
             # Some init dor the Viewer
             app.pane1.Viewer1.setPlaybackMode(NatronEngine.Natron.PlaybackModeEnum(0))
-            app.pane1.Viewer1.setFrameRange(thisNode.atFrameNum.get(), thisNode.duraTion.get())
-            # calculate Mplayer duration loop
+            app.pane1.Viewer1.setFrameRange(thisNode.atFrameNum.get(), thisNode.duraTion.get() + thisNode.atFrameNum.get())
+            # calculate ffplay duration loop
             duration_loop = thisNode.duraTion.get() / thisNode.framesPerSec.get()
-            # start Mplayer
-            os.system("ffplay -nodisp " + str(audio_file) + " -t " + str(duration_loop) + " -loop 0 >/dev/null 2>&1 &")
+            # start ffplay
+            os.system("ffplay -nodisp " + str(audio_file) + " -t " + str(duration_loop) + " -loop 0  & echo $! > /tmp/pid_natron_ffplay")
             app.pane1.Viewer1.pause()
             app.pane1.Viewer1.seek(thisNode.atFrameNum.get())
             app.pane1.Viewer1.startForward()
@@ -154,7 +163,7 @@ def paramHasChanged(thisParam, thisNode, thisGroup, app, userEdited):
     # Stop preview
     if thisParam == thisNode.stopSync:
         if audio_file:
-            os.system("killall ffplay >/dev/null 2>&1 ")  # Very sad !
+            kill_pid_player()
             app.pane1.Viewer1.pause()
         else:
             error_man("Audio Editor", "You need to set a audio file before preview !")
