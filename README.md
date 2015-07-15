@@ -1,14 +1,13 @@
 # audio2ascii (Only Linux and Mac Osx)
   Natron2.0 python plugin to animate you parameters with waveform from an audio file(mp3, wav,aiff,...).
-  
+
   It try to preview audio while viewer playing. it can be usefull until [the basic sound support](https://github.com/MrKepzie/Natron/issues/76#issuecomment-120059396) in future Natron versions (>2.0).
-  
+
   An external app can be set and launch from the plugin to edit audio file (e.g. audacity..)
-  
+
   The plugin use a bash script(audio2ascii.sh), sox to convert audio and ffplay(from ffpmeg) to play the preview.
-  
-  OSX users will need to set windowed apps PATH (depend of your Mac version) to find sox, ffplay.
-  
+
+
   [Here is a Demo/tuto](https://www.youtube.com/watch?v=koagSOPnsVw)
 
  ![frame](https://cloud.githubusercontent.com/assets/10021906/8639016/ce766e70-28cc-11e5-9c19-486f64b71992.png)
@@ -38,7 +37,7 @@
  * <u>[gawk](http://www.gnu.org/software/gawk)</u> (Mac OSX users only, awk doesn't support floats):
 
      - **sudo port install gawk**</u>
-     
+
 
  * [yad](http://sourceforge.net/projects/yad-dialog) (optional, stand alone GUI on Linux):
 
@@ -47,23 +46,26 @@
     - <u>Fedora:</u>**sudo yum install yad**
 
 #Installation / Usage
+
+Just copy audio2ascii.sh, AudioToAscii.py and AudioToAscii.png in your Home Natron Plugins directory.
+
 For Linux
 ```
-$ wget https://github.com/rcspam/audio2ascii/archive/v1.9.tar.gz
-$ tar xvzf audio2ascii-1.9.tar.gz
-$ cd audio2ascii-1.9 
+$ wget https://github.com/rcspam/audio2ascii/archive/v2.0beta.tar.gz
+$ tar xvzf audio2ascii-2.0beta.tar.gz
+$ cd audio2ascii-2.0beta
 $ cp audio2ascii.sh AudioToAscii.png AudioToAscii.py  $HOME/.local/share/INRIA/Natron/Plugins
 ```
 
 For OSX
 ```
-$ wget https://github.com/rcspam/audio2ascii/archive/v1.9.tar.gz
-$ tar xvzf audio2ascii-1.9.tar.gz
-$ cd audio2ascii-1.9
+$ wget https://github.com/rcspam/audio2ascii/archive/v2.0beta.tar.gz
+$ tar xvzf audio2ascii-2.0beta.tar.gz
+$ cd audio2ascii-2.0beta
 $ cp audio2ascii.sh AudioToAscii.png AudioToAscii.py  $HOME/Library/Application\ Support/INRIA/Natron/Plugins
 ```
 
-(Optional)
+Some extras (Optional)
 
  * If you want add a menu command to the Natron menu-bar, add the following lines in the init.py of your home Natron plugin directory (create it if doesn't exist):
 ```
@@ -84,7 +86,7 @@ NatronGui.natron.addMenuCommand("Ext-Tools/AudioToAscii","audioToAscii",QtCore.Q
  * Linux users can run audio2ascii.sh as standalone to create ascii curves (yad must be installed)
 
 ```
-$ your/path/to/audio2ascii.sh -g 
+$ your/path/to/audio2ascii.sh -g
 ```
 
 #Examples
