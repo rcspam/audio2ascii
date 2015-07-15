@@ -7,7 +7,9 @@
   The plugin use a bash script(audio2ascii.sh), sox to convert audio and ffplay(from ffpmeg) to play the preview.
 
 
-  [Here is a Demo/tuto](https://www.youtube.com/watch?v=koagSOPnsVw)
+  [Here is a Demo/tuto](https://www.youtube.com/watch?v=koagSOPnsVw).
+  
+  Other videos in the [examples section](https://github.com/rcspam/audio2ascii/blob/master/README.md#examples) below.
 
  ![frame](https://cloud.githubusercontent.com/assets/10021906/8639016/ce766e70-28cc-11e5-9c19-486f64b71992.png)
 
