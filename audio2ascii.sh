@@ -29,7 +29,7 @@ function error() {
 
 function awkmax() {
 	echo $line | grep -v ";" | sed 's/ [[:blank:]]//g;s/[[:space:]]/ /g' |\
-		gawk -v maxdx="$maxdx" -v maxdy="$maxdy"\
+		${path_bin}gawk -v maxdx="$maxdx" -v maxdy="$maxdy"\
 		'\
 		{if ($2 < 0) $2 = -$2}\
 		{if (($2) > maxdx) maxdx = ($2)}\
@@ -41,7 +41,7 @@ function awkmax() {
 
 function awkxy() {
 	echo $line | grep -v ";" | sed 's/ [[:blank:]]//g;s/[[:space:]]/ /g' |\
-		gawk -v factx="$factx" -v facty="$facty" -v maxx="$maxx" -v maxy="$maxy" -v maxdx="$maxdx"  -v maxdy="$maxdy"\
+		${path_bin}gawk -v factx="$factx" -v facty="$facty" -v maxx="$maxx" -v maxy="$maxy" -v maxdx="$maxdx"  -v maxdy="$maxdy"\
 			'\
 			{printf "%.10f %.10f\n", ($2*factx/maxdx), ($3*facty/maxdy)}\
 			{if ($2 < 0) $2 = -$2}\
@@ -52,7 +52,7 @@ function awkxy() {
 			'
 }
 
-version="1.9"
+version="2.0beta"
 data="/tmp/data_$$_tmp.dat"
 error_log="/tmp/error_log_sox_$$"
 dim_def="^x!y!xy" # Default: x dimension 
@@ -65,12 +65,16 @@ os=$(uname)
 [[ "$os" =~ "Darwin" ]] && osx=1 && linux=0
 [[ "$os" =~ "Linux" ]] && osx=0 && linux=1
 
-if [[ ! $(which sox) ]];then
-	echo "$0 require 'sox' which is not installed"
+echo osx=$osx linux=$linux
+
+[[ $osx = 1 ]] && path_bin="/opt/local/bin/" || path_bin=""
+
+if [[ ! $(which ${path_bin}sox) ]];then
+	echo "$0 require ${path_bin}sox 'sox' which is not installed"
 	exit 1  
 fi
 
-if [[ ! $(which ffplay) ]];then
+if [[ ! $(which ${path_bin}ffplay) ]];then
 	echo "$0 require 'ffplay (ffmpeg)' which is not installed"
 	exit 1  
 fi
@@ -129,12 +133,13 @@ else
 	facty="${7:-100}"
 fi
 
-# convert audio to .dat 
-srate=$(sox --i "${in}" 2>${error_log} | grep "^Sample Rate" | awk '{print $4}')
+# convert audio to .dat
+[[ $osx ]] && sox_app="/opt/local/bin/sox "
+srate=$(${path_bin}sox --i "${in}" 2>${error_log} | grep "^Sample Rate" | ${path_bin}gawk '{print $4}')
 end=$(echo "${dur}/${fps}" | bc -l)
 echo CMD: sox "${in}" -r ${fps} "${data}" trim 0 ${end}
 echo -n "Converting $in to Data file with SampleRate $fps (original: $srate)..."
-sox "${in}" -r ${fps} "${data}" trim 0 ${end} 2>${error_log} || error 1
+${path_bin}sox "${in}" -r ${fps} "${data}" trim 0 ${end} 2>${error_log} || error 1
 echo "Done"
 
 # Search the dry maximum variation in x and in y
