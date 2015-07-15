@@ -47,26 +47,44 @@
     - <u>Fedora:</u>**sudo yum install yad**
 
 #Installation / Usage
+For Linux
+```
+$ wget https://github.com/rcspam/audio2ascii/archive/v1.9.tar.gz
+$ tar xvzf audio2ascii-1.9.tar.gz
+$ cd audio2ascii-1.9 
+$ cp audio2ascii.sh AudioToAscii.png AudioToAscii.py  $HOME/.local/share/INRIA/Natron/Plugins
+```
 
+For OSX
 ```
 $ wget https://github.com/rcspam/audio2ascii/archive/v1.9.tar.gz
 $ tar xvzf audio2ascii-1.9.tar.gz
 $ cd audio2ascii-1.9
-$ cp ./audio2ascii.sh /somewhere/in/your/path  # must be in your $PATH
+$ cp audio2ascii.sh AudioToAscii.png AudioToAscii.py  $HOME/Library/Application\ Support/INRIA/Natron/Plugins
 ```
-If you want start audio2ascii from Natron, you should run it with its gui (yad must be installed). To install the plugin AudioToAscii.py and its icon:
-```
-$ # create the local Plugins directory if it doesn't exist
-$ mkdir $HOME/.local/share/INRIA/Natron/Plugins
-$ cp ./AudioToAscii.*  $HOME/.local/share/INRIA/Natron/Plugins
-```
-If you want just add a menu command to the application’s menu-bar, add the following lines in your $HOME/.local/share/INRIA/Natron/Plugins/init.py (create init.py if doesn't exist):
 
+(Optional)
+
+ * If you want add a menu command to the Natron menu-bar, add the following lines in the init.py of your home Natron plugin directory (create it if doesn't exist):
 ```
+# Linux
 import os
 def audioToAscii():
-    os.system("audio2ascii.sh -g &")
+    os.system("$HOME/.local/share/INRIA/Natron/Plugins/audio2ascii.sh -g &")
 NatronGui.natron.addMenuCommand("Ext-Tools/AudioToAscii","audioToAscii",QtCore.Qt.Key.Key_L,QtCore.Qt.KeyboardModifier.ShiftModifier)
+```
+```
+# OSX
+import os
+def audioToAscii():
+    os.system("$HOME/Library/Application\ Support/INRIA/Natron/Plugins/audio2ascii.sh -g &")
+NatronGui.natron.addMenuCommand("Ext-Tools/AudioToAscii","audioToAscii",QtCore.Qt.Key.Key_L,QtCore.Qt.KeyboardModifier.ShiftModifier)
+```
+
+ * Linux users can run audio2ascii.sh as standalone to create ascii curves (yad must be installed)
+
+```
+$ your/path/to/audio2ascii.sh -g 
 ```
 
 #Examples
