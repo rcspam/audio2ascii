@@ -5,9 +5,9 @@
   
   An external app can be set and launch from the plugin to edit audio file (e.g. audacity..)
   
-  The plugin use a bash script(audio2ascii.sh), sox to convert audio and ffplay(from ffpmeg) to play the preview, you must have them in your environment PATH.
+  The plugin use a bash script(audio2ascii.sh), sox to convert audio and ffplay(from ffpmeg) to play the preview.
   
-  OSX users will need to set PATH for terminal (~/.profile, ~/.bash_profile, or ~/.bashrc) and windowed apps (depend of your Mac version).
+  OSX users will need to set windowed apps PATH (depend of your Mac version) to find sox, ffplay.
   
   [Here is a Demo/tuto](https://www.youtube.com/watch?v=koagSOPnsVw)
 
