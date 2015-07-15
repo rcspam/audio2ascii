@@ -35,7 +35,7 @@ def error_man(titleEM, messEM):
 def kill_pid_player(tfKPP):
     pid_file_kpp = open(tfKPP, "r")
     pid = pid_file_kpp.readline()
-    os.system("kill " + pid)
+    os.system("/bin/kill " + pid)
     pid_file_kpp.close()
 
 def audioToAscii(audioFileATA, asciiFileATA, dimATA, fpsATA, durationATA, xHeightATA, yHeightATA):
@@ -156,7 +156,10 @@ def paramHasChanged(thisParam, thisNode, thisGroup, app, userEdited):
             # calculate ffplay duration loop
             duration_loop = thisNode.duraTion.get() / thisNode.framesPerSec.get()
             # start ffplay
-            os.system("ffplay -nodisp " + str(audio_file) + " -t " + str(duration_loop) + " -loop 0  & echo $! >" + tmp_file)
+            if NatronEngine.natron.isLinux():
+                os.system("ffplay -nodisp " + str(audio_file) + " -t " + str(duration_loop) + " -loop 0  & echo $! >" + tmp_file)
+            elif NatronEngine.natron.isMacOSX():
+                os.system("/opt/local/bin/ffplay -nodisp " + str(audio_file) + " -t " + str(duration_loop) + " -loop 0  & echo $! >" + tmp_file)
             app.pane1.Viewer1.pause()
             app.pane1.Viewer1.seek(thisNode.atFrameNum.get())
             app.pane1.Viewer1.startForward()
