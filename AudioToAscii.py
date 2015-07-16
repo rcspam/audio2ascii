@@ -6,7 +6,9 @@ import NatronEngine
 
 # extra lib added
 import NatronGui
-import os, time, tempfile
+import os, time, tempfile, posixpath
+# decomment for windows
+# import ntpath
 from os import *
 
 def getPluginID():
@@ -38,25 +40,37 @@ def kill_pid_player(tfKPP):
     os.system("/bin/kill " + pid)
     pid_file_kpp.close()
 
+# 'Convert audio to ascii' function
 def audioToAscii(audioFileATA, asciiFileATA, dimATA, fpsATA, durationATA, xHeightATA, yHeightATA):
     if NatronEngine.natron.isUnix():
+        # local plugins path - 2 var because space in "osx path"
         if NatronEngine.natron.isLinux():
-            audio2ascii_dir = "$HOME/.local/share/INRIA/Natron/Plugins/"
+            audio2ascii_dir = os.environ['HOME'] + "/.local/share/INRIA/Natron/Plugins/"
+            audio2ascii_dir_path = os.environ['HOME'] + "/.local/share/INRIA/Natron/Plugins/"
         elif NatronEngine.natron.isMacOSX():
-            audio2ascii_dir = "$HOME/Library/Application\ Support/INRIA/Natron/Plugins/"
-        exec_a2a = str(audio2ascii_dir + "audio2ascii.sh ")
-        
-        # Files to pass
-        files_a2a = str("'" + str(audioFileATA) + "' '" + str(asciiFileATA) + "' ")
-        # Param to pass
+            audio2ascii_dir = os.environ['HOME'] + "/Library/Application\ Support/INRIA/Natron/Plugins/"
+            audio2ascii_dir_path = os.environ['HOME'] + "/Library/Application Support/INRIA/Natron/Plugins/"
+        # complet path
+        exec_a2a = str(audio2ascii_dir + "audio2ascii.sh")
+        path_a2a = str(audio2ascii_dir_path + "audio2ascii.sh")
+        # set audio File & ascii file
+        files_a2a = str("'" + str(audioFileATA) + "' '" + str(asciiFileATA) + "'")
+        # set param
         param_a2a = str(dimATA) + " " +  str(fpsATA) + " " +  str(durationATA) + " " +  str(xHeightATA)  + " " + str(yHeightATA)
-        # Launch audio2ascii
-        ret_a2a = os.system(exec_a2a + files_a2a + param_a2a )
-        return ret_a2a
+        # audio2ascii.sh exist in local plugin path ?
+        if os.path.exists(path_a2a):
+            # Launch audio2ascii
+            ret_a2a = os.system(exec_a2a + " " + files_a2a + " " + param_a2a )
+            return ret_a2a
+        else:
+            error_man("audio2ascii.sh", "'audio2ascii.sh' not found !   \n\nRe-install ite in '" + audio2ascii_dir_path + "'")
+            return 1
     elif NatronEngine.natron.isWindows():
-        # add executable for windows here
+        # add verif path and executable for windows here
         error_man("Unix Only", "Sorry, this plugin works only on Linux and Mas Osx !")
+        return 1
 
+# 'Generate the animate curves' function
 def animCurves(thisParam, fileAC, dimAC, fpsAC, durationAC ,frameStartAC):
     # ascii file
     asciiAC = open(fileAC, "r")
@@ -117,29 +131,32 @@ def paramHasChanged(thisParam, thisNode, thisGroup, app, userEdited):
     if audio_file and ext_edit_app and thisParam == thisNode.editAudio:
         # On Linux and Osx
         if NatronEngine.natron.isUnix():
-            os.system(ext_edit_app + " " + ext_edit_app_param + " '" + audio_file + "' &")
+            if os.path.exists(ext_edit_app):
+                os.system(ext_edit_app + " " + ext_edit_app_param + " '" + audio_file + "' &")
+            else:
+                error_man("Audio Editor", "'" + ext_edit_app + "' not found !\n\nSet an audio editor complet path.")
         if NatronEngine.natron.isWindows():
-            # add executable for windows here
+            # add verif and executable for windows here
             NatronGui.natron.warningDialog("Unix Only", "Sorry, this plugin works only on Linux and Mas Osx !")
     # no editor path set
     else:
         if not ext_edit_app and thisParam == thisNode.editAudio:
-            error_man("Audio Editor", "You need to set a audio editor !\nUnfold group below and fill the editor settings")
+            error_man("Audio Editor", "You need to set a audio editor !\n\nUnfold group below and fill the editor settings.")
         if not audio_file and thisParam == thisNode.editAudio:
             error_man("Audio Editor", "You need to set a audio file before edit it !")
     
     # Import Curve # add verif param set !!!!
     if ascii_file and audio_file and thisParam == thisNode.importCurve:
         ret_exec = audioToAscii(audio_file, ascii_file, dimension, thisNode.framesPerSec.get(), thisNode.duraTion.get(), thisNode.xHeight.get(), thisNode.yHeight.get())
-        # test and wait end of audio2ascii 
+        # wait return of audio2ascii 
         if ret_exec == 0:
             # calculate animation 
             animCurves(thisNode.curveIn, ascii_file, thisNode.dimEnsion.get(), thisNode.framesPerSec.get(), thisNode.duraTion.get(), thisNode.atFrameNum.get())
-    # Is input and output files set before generate curve
+    # Is input and output files set before generate curve ?
     if not audio_file and thisParam == thisNode.importCurve:
-        error_man("Audio File", "No Audio File set !\nYou need to set a input audio file path before generate the curves.")
+        error_man("Audio File", "No Audio File set !\n\nYou need to set a input audio file path before generate the curves.")
     if not ascii_file and thisParam == thisNode.importCurve:
-        error_man("Curve File", "No Curve File set !\nYou need to set a output curve file path before generate the curves.")
+        error_man("Curve File", "No Curve File set !\n\nYou need to set a output curve file path before generate the curves.")
     # Reset the curve
     if thisParam == thisNode.resetCurves:
         thisNode.curveIn.removeAnimation(0)
@@ -150,16 +167,20 @@ def paramHasChanged(thisParam, thisNode, thisGroup, app, userEdited):
         if audio_file and tmp_file:
             # stop viewer & ffplay if playing
             kill_pid_player(tmp_file)
-            # Some init dor the Viewer
+            # Some init fyor the Viewer
             app.pane1.Viewer1.setPlaybackMode(NatronEngine.Natron.PlaybackModeEnum(0))
             app.pane1.Viewer1.setFrameRange(thisNode.atFrameNum.get(), thisNode.duraTion.get() + thisNode.atFrameNum.get())
             # calculate ffplay duration loop
             duration_loop = thisNode.duraTion.get() / thisNode.framesPerSec.get()
-            # start ffplay
-            if NatronEngine.natron.isLinux():
+            # verify if ffplay is installed and start it
+            if NatronEngine.natron.isLinux() and not os.system("which ffplay"):
                 os.system("ffplay -nodisp " + str(audio_file) + " -t " + str(duration_loop) + " -loop 0  & echo $! >" + tmp_file)
-            elif NatronEngine.natron.isMacOSX():
+            elif NatronEngine.natron.isMacOSX() and os.path.exists("/opt/local/bin/ffplay"):
                 os.system("/opt/local/bin/ffplay -nodisp " + str(audio_file) + " -t " + str(duration_loop) + " -loop 0  & echo $! >" + tmp_file)
+            # add windows player here
+            #elif NatronEngine.natron.isWindows(): and os.path.exists("path/windows/player"):
+            else:
+                error_man("ffplay", "'ffplay not found !\n\nYou need to have ffplay installed on your system !\n\nOSX: sudo port install ffmpeg\nLinux: sudo {apt-get|yum} install ffmpeg")
             app.pane1.Viewer1.pause()
             app.pane1.Viewer1.seek(thisNode.atFrameNum.get())
             app.pane1.Viewer1.startForward()
@@ -285,7 +306,7 @@ def createInstance(app,group):
     param.setHelp("Set the audio editor path")
     param.setAddNewLine(True)
     param.setAnimationEnabled(False)
-    param.setDefaultValue("audacity")
+    param.setDefaultValue("/usr/bin/audacity")
     lastNode.editApp = param
     del param
 
