@@ -1,14 +1,15 @@
-# audio2ascii (Only Linux and Mac Osx)
-  Natron2.0 python plugin to animate you parameters with waveform from an audio file(mp3, wav,aiff,...).
-
-  It try to preview audio while viewer playing. it can be usefull until [the basic sound support](https://github.com/MrKepzie/Natron/issues/76#issuecomment-120059396) in future Natron versions (>2.0).
+# audio2ascii
+  Natron2.0 python plugin for Linux and MacOSX to animate you parameters with waveform from an audio file(mp3, wav,aiff,...).
+  It can do a basic preview audio while viewer playing, this can be usefull [until a sound support](https://github.com/MrKepzie/Natron/issues/76#issuecomment-120059396) in future Natron versions (>2.0).
 
   An external app can be set and launch from the plugin to edit audio file (e.g. audacity..)
 
   The plugin use a bash script(audio2ascii.sh), sox to convert audio and ffplay(from ffpmeg) to play the preview.
 
 
-  [Here is a Demo/tuto](https://www.youtube.com/watch?v=koagSOPnsVw)
+  [Here is a Demo/tuto](https://www.youtube.com/watch?v=koagSOPnsVw).
+  
+  Other videos in the [examples section](https://github.com/rcspam/audio2ascii/blob/master/README.md#examples) below.
 
  ![frame](https://cloud.githubusercontent.com/assets/10021906/8639016/ce766e70-28cc-11e5-9c19-486f64b71992.png)
 
@@ -58,12 +59,9 @@ $ cp audio2ascii.sh AudioToAscii.png AudioToAscii.py  $HOME/.local/share/INRIA/N
 ```
 
 For OSX
-```
-$ wget https://github.com/rcspam/audio2ascii/archive/v2.0beta.tar.gz
-$ tar xvzf audio2ascii-2.0beta.tar.gz
-$ cd audio2ascii-2.0beta
-$ cp audio2ascii.sh AudioToAscii.png AudioToAscii.py  $HOME/Library/Application\ Support/INRIA/Natron/Plugins
-```
+Download [last version](https://github.com/rcspam/audio2ascii/archive/v2.0beta.tar.gz)
+Copy audio2ascii.sh AudioToAscii.png AudioToAscii.py in  /Users/your_name/Library/Application\ Support/INRIA/Natron/Plugins
+
 
 Some extras (Optional)
 
