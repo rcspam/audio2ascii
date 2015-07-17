@@ -169,7 +169,7 @@ def paramHasChanged(thisParam, thisNode, thisGroup, app, userEdited):
             kill_pid_player(tmp_file)
             # Some init fyor the Viewer
             app.pane1.Viewer1.setPlaybackMode(NatronEngine.Natron.PlaybackModeEnum(0))
-            app.pane1.Viewer1.setFrameRange(thisNode.atFrameNum.get(), thisNode.duraTion.get() + thisNode.atFrameNum.get())
+            app.pane1.Viewer1.setFrameRange(thisNode.atFrameNum.get(), thisNode.duraTion.get() -1 + thisNode.atFrameNum.get())
             # calculate ffplay duration loop
             duration_loop = thisNode.duraTion.get() / thisNode.framesPerSec.get()
             # verify if ffplay is installed and start it
