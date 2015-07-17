@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Name=audio2ascii
+GenericName=Audio Curve Generator (YAD)
+Comment=Create curve data from audio
+Exec=bash -c "/home/${USER}/.local/share/INRIA/Natron/Plugins/audio2ascii.sh -g"
+Icon=AudioToAscii.png
+Terminal=false
+Type=Application
+StartupNotify=false
+Categories=Graphics;Audio;
+X-Desktop-File-Install-Version=0.21
