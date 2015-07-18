@@ -8,7 +8,7 @@
 
 
   [Here is a Demo/tuto](https://www.youtube.com/watch?v=koagSOPnsVw).
-  
+
   Other videos in the [examples section](https://github.com/rcspam/audio2ascii/blob/master/README.md#examples) below.
 
  ![frame](https://cloud.githubusercontent.com/assets/10021906/8639016/ce766e70-28cc-11e5-9c19-486f64b71992.png)
@@ -55,13 +55,19 @@ For Linux
 $ wget https://github.com/rcspam/audio2ascii/archive/v2.0beta.tar.gz
 $ tar xvzf audio2ascii-2.0beta.tar.gz
 $ cd audio2ascii-2.0beta
-$ cp audio2ascii.sh AudioToAscii.png AudioToAscii.py  $HOME/.local/share/INRIA/Natron/Plugins
+$ ./install.sh
 ```
 
 For OSX
-Download [last version](https://github.com/rcspam/audio2ascii/archive/v2.0beta.tar.gz)
-Copy audio2ascii.sh AudioToAscii.png AudioToAscii.py in  /Users/your_name/Library/Application\ Support/INRIA/Natron/Plugins
+```
+Download [last version](https://github.com/rcspam/audio2ascii/archive/v2.0beta.tar.gz).
+Decompress it where you want and launch './install.sh' from the decompress directory in a terminal
+```
 
+For Windows (@Olear [AudioCurve binaries](https://github.com/olear/audiocurve))
+```
+Ongoing works !
+```
 
 Some extras (Optional)
 
