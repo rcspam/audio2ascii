@@ -7,9 +7,7 @@ import NatronEngine
 # extra lib added
 import NatronGui
 import os, time, tempfile, posixpath
-# decomment for windows
-# import ntpath
-from os import *
+from os import path
 
 def getPluginID():
     return "AudioToAscii"
@@ -42,33 +40,31 @@ def kill_pid_player(tfKPP):
 
 # 'Convert audio to ascii' function
 def audioToAscii(audioFileATA, asciiFileATA, dimATA, fpsATA, durationATA, xHeightATA, yHeightATA):
+    # Linux & OSX
     if NatronEngine.natron.isUnix():
-        # local plugins path - 2 var because space in "osx path"
-        if NatronEngine.natron.isLinux():
-            audio2ascii_dir = os.environ['HOME'] + "/.local/share/INRIA/Natron/Plugins/"
-            audio2ascii_dir_path = os.environ['HOME'] + "/.local/share/INRIA/Natron/Plugins/"
-        elif NatronEngine.natron.isMacOSX():
-            audio2ascii_dir = os.environ['HOME'] + "/Library/Application\ Support/INRIA/Natron/Plugins/"
-            audio2ascii_dir_path = os.environ['HOME'] + "/Library/Application Support/INRIA/Natron/Plugins/"
+        exec_file = "/audio2ascii.sh"
         # complet path
-        exec_a2a = str(audio2ascii_dir + "audio2ascii.sh")
-        path_a2a = str(audio2ascii_dir_path + "audio2ascii.sh")
+        path_a2a = str(os.path.dirname(os.path.realpath(__file__)) + exec_file).replace(" ", "\ ")
         # set audio File & ascii file
         files_a2a = str("'" + str(audioFileATA) + "' '" + str(asciiFileATA) + "'")
         # set param
         param_a2a = str(dimATA) + " " +  str(fpsATA) + " " +  str(durationATA) + " " +  str(xHeightATA)  + " " + str(yHeightATA)
         # audio2ascii.sh exist in local plugin path ?
-        if os.path.exists(path_a2a):
-            # Launch audio2ascii
-            ret_a2a = os.system(exec_a2a + " " + files_a2a + " " + param_a2a )
-            return ret_a2a
-        else:
-            error_man("audio2ascii.sh", "'audio2ascii.sh' not found !   \n\nRe-install ite in '" + audio2ascii_dir_path + "'")
-            return 1
+    # Windows
     elif NatronEngine.natron.isWindows():
-        # add verif path and executable for windows here
-        error_man("Unix Only", "Sorry, this plugin works only on Linux and Mas Osx !")
+        exec_file = "/AudioCurve.exe"
+        path_a2a = str(os.path.dirname(os.path.realpath(__file__))) + exec_file
+        files_a2a = "-input \""+str(audioFileATA)+"\" -output \""+str(asciiFileATA)+"\""
+        param_a2a = "-"+str(dimATA)+" -fps "+str(fpsATA)+" -frames "+str(durationATA)+" -cX "+str(xHeightATA)+" -cY "+str(yHeightATA)
+
+    if os.path.exists(os.path.dirname(os.path.realpath(__file__)) + exec_file):
+        # Launch audio2ascii
+        ret_a2a = os.system(path_a2a + " " + files_a2a + " " + param_a2a )
+        return ret_a2a
+    else:
+        error_man(exec_file, "'" + exec_file + "' not found !   \n\nRe-install it in '" + path_a2a + "'")
         return 1
+
 
 # 'Generate the animate curves' function
 def animCurves(thisParam, fileAC, dimAC, fpsAC, durationAC ,frameStartAC):
@@ -114,6 +110,14 @@ def paramHasChanged(thisParam, thisNode, thisGroup, app, userEdited):
     
     tmp_file = thisNode.tmpFile.get()
     
+    # update to current project frame rate
+    #if thisParam == thisNode.currentFrameRate or thisNode.autoFR.get():
+    if thisNode.autoFR.get():
+        thisNode.framesPerSec.setEnabled(False)
+        thisNode.framesPerSec.set(app.frameRate.get())
+    else:
+        thisNode.framesPerSec.setEnabled(True)
+    
     # update start at current frame
     if thisParam == thisNode.currentFrame:
         thisNode.atFrameNum.set(app.timelineGetTime())
@@ -147,7 +151,7 @@ def paramHasChanged(thisParam, thisNode, thisGroup, app, userEdited):
     
     # Import Curve # add verif param set !!!!
     if ascii_file and audio_file and thisParam == thisNode.importCurve:
-        ret_exec = audioToAscii(audio_file, ascii_file, dimension, thisNode.framesPerSec.get(), thisNode.duraTion.get(), thisNode.xHeight.get(), thisNode.yHeight.get())
+        ret_exec = audioToAscii(audio_file, ascii_file, dimension, int(thisNode.framesPerSec.get()), thisNode.duraTion.get(), thisNode.xHeight.get(), thisNode.yHeight.get())
         # wait return of audio2ascii 
         if ret_exec == 0:
             # calculate animation 
@@ -171,14 +175,15 @@ def paramHasChanged(thisParam, thisNode, thisGroup, app, userEdited):
             app.pane1.Viewer1.setPlaybackMode(NatronEngine.Natron.PlaybackModeEnum(0))
             app.pane1.Viewer1.setFrameRange(thisNode.atFrameNum.get(), thisNode.duraTion.get() -1 + thisNode.atFrameNum.get())
             # calculate ffplay duration loop
-            duration_loop = thisNode.duraTion.get() / thisNode.framesPerSec.get()
+            duration_loop = (thisNode.duraTion.get() -1) / thisNode.framesPerSec.get()
             # verify if ffplay is installed and start it
             if NatronEngine.natron.isLinux() and not os.system("which ffplay"):
                 os.system("ffplay -nodisp " + str(audio_file) + " -t " + str(duration_loop) + " -loop 0  & echo $! >" + tmp_file)
             elif NatronEngine.natron.isMacOSX() and os.path.exists("/opt/local/bin/ffplay"):
                 os.system("/opt/local/bin/ffplay -nodisp " + str(audio_file) + " -t " + str(duration_loop) + " -loop 0  & echo $! >" + tmp_file)
-            # add windows player here
-            #elif NatronEngine.natron.isWindows(): and os.path.exists("path/windows/player"):
+            elif NatronEngine.natron.isWindows():
+                # Replace error_man by windows player here
+                error_man("Play preview", "Function only availaible on Linux And MacOsx for now !\n\n Be patient;)")
             else:
                 error_man("ffplay", "'ffplay not found !\n\nYou need to have ffplay installed on your system !\n\nOSX: sudo port install ffmpeg\nLinux: sudo {apt-get|yum} install ffmpeg")
             app.pane1.Viewer1.pause()
@@ -188,7 +193,7 @@ def paramHasChanged(thisParam, thisNode, thisGroup, app, userEdited):
             error_man("Audio Editor", "You need to set a audio file before preview !")
     # Stop preview
     if thisParam == thisNode.stopSync:
-        if audio_file and tmp_file:
+        if tmp_file:
             kill_pid_player(tmp_file)
             app.pane1.Viewer1.pause()
         else:
@@ -336,7 +341,7 @@ def createInstance(app,group):
     param.setHelp("")
     param.setAddNewLine(True)
     param.setAnimationEnabled(False)
-    param.setDefaultValue("/tmp/curve.ascii")
+    param.setDefaultValue(os.path.join(tempfile.gettempdir(),"audiocurve"))
     lastNode.curveFile = param
     del param
 
@@ -366,10 +371,10 @@ def createInstance(app,group):
     lastNode.dimEnsion = param
     del param
 
-    param = lastNode.createIntParam("framesPerSec", "Frame Rate")
+    param = lastNode.createDoubleParam("framesPerSec", "Frame Rate")
     param.setDisplayMinimum(0, 0)
     param.setDisplayMaximum(100, 0)
-    param.setDefaultValue(24, 0)
+    param.setDefaultValue(app.frameRate.get(), 0)
 
     #Add the param to the page
     lastNode.userNatron.addParam(param)
@@ -379,6 +384,34 @@ def createInstance(app,group):
     param.setAddNewLine(True)
     param.setAnimationEnabled(True)
     lastNode.framesPerSec = param
+    del param
+
+    #param = lastNode.createButtonParam("currentFrameRate", "current Frame Rate")
+
+    ##Add the param to the page
+    #lastNode.userNatron.addParam(param)
+
+    ##Set param properties
+    #param.setHelp("Update to current project frame rate manually")
+    #param.setAddNewLine(False)
+    #param.setPersistant(False)
+    #param.setEvaluateOnChange(False)
+    #lastNode.currentFrameRate = param
+    #del param
+
+    param = lastNode.createBooleanParam("autoFR", "Auto")
+    param.setDefaultValue(1)
+
+    #Add the param to the page
+    lastNode.userNatron.addParam(param)
+
+    #Set param properties
+    param.setHelp("If check, set frame rate to project frame rate")
+    param.setAddNewLine(False)
+    param.setEvaluateOnChange(False)
+    param.setAnimationEnabled(True)
+    param.setValue(True)
+    lastNode.autoFR = param
     del param
 
     param = lastNode.createIntParam("duraTion", "Duration")
@@ -500,69 +533,68 @@ def createInstance(app,group):
     lastNode.resetCurves = param
     del param
 
-    # ONLY Unix (test preview Viewer/Audio)
-    if NatronEngine.natron.isUnix():
-        param = lastNode.createStringParam("viewerAudio", "Preview Viewer/Audio")
-        param.setType(NatronEngine.StringParam.TypeEnum.eStringTypeLabel)
-        
-        #Add the param to the page
-        lastNode.userNatron.addParam(param)
-        
-        #Set param properties
-        param.setHelp("")
-        param.setAddNewLine(True)
-        param.setEvaluateOnChange(False)
-        param.setAnimationEnabled(False)
-        lastNode.viewerAudio = param
-        del param
-        
-        param = lastNode.createButtonParam("playSync", "\u25b6")
+    # FFPLAY --------
+    param = lastNode.createStringParam("viewerAudio", "Preview Viewer/Audio")
+    param.setType(NatronEngine.StringParam.TypeEnum.eStringTypeLabel)
 
-        #Add the param to the page
-        lastNode.userNatron.addParam(param)
-        
-        #Set param properties
-        param.setHelp("Start preview  Viewer/Audio\nFor a better sync, Play/Cache the images in the viewer before preview")
-        param.setAddNewLine(True)
-        param.setPersistant(False)
-        param.setEvaluateOnChange(False)
-        lastNode.playSync = param
-        del param
-        
-        param = lastNode.createButtonParam("stopSync", "\u25a0")
+    	#Add the param to the page
+    lastNode.userNatron.addParam(param)
 
-        #Add the param to the page
-        lastNode.userNatron.addParam(param)
+    #Set param properties
+    param.setHelp("")
+    param.setAddNewLine(True)
+    param.setEvaluateOnChange(False)
+    param.setAnimationEnabled(False)
+    lastNode.viewerAudio = param
+    del param
 
-        #Set param properties
-        param.setHelp("Stop preview Viewer/Audio")
-        param.setAddNewLine(False)
-        param.setPersistant(False)
-        param.setEvaluateOnChange(False)
-        lastNode.stopSync = param
-        del param
-        
-        param = lastNode.createStringParam("betterPreview", "It's better to Play/Cache the images\nin the viewer before start the preview")
-        param.setType(NatronEngine.StringParam.TypeEnum.eStringTypeLabel)
+    param = lastNode.createButtonParam("playSync", "\u25b6")
 
-        #Add the param to the page
-        lastNode.userNatron.addParam(param)
+    #Add the param to the page
+    lastNode.userNatron.addParam(param)
 
-        #Set param properties
-        param.setHelp("")
-        param.setAddNewLine(False)
-        param.setEvaluateOnChange(False)
-        param.setAnimationEnabled(False)
-        lastNode.betterPreview = param
-        del param
-        
-        # Create a tempfile within "ffplay pid"
-        param = lastNode.createFileParam("tmpFile", "Temp File")
-        param.setVisible(False)
-        tf = tempfile.NamedTemporaryFile(delete=False)
-        param.setDefaultValue(tf.name)
-        lastNode.tmpFile = param
-        del param
+    #Set param properties
+    param.setHelp("Start preview  Viewer/Audio\nFor a better sync, Play/Cache the images in the viewer before preview")
+    param.setAddNewLine(True)
+    param.setPersistant(False)
+    param.setEvaluateOnChange(False)
+    lastNode.playSync = param
+    del param
+
+    param = lastNode.createButtonParam("stopSync", "\u25a0")
+
+    #Add the param to the page
+    lastNode.userNatron.addParam(param)
+
+    #Set param properties
+    param.setHelp("Stop preview Viewer/Audio")
+    param.setAddNewLine(False)
+    param.setPersistant(False)
+    param.setEvaluateOnChange(False)
+    lastNode.stopSync = param
+    del param
+
+    param = lastNode.createStringParam("betterPreview", "It's better to Play/Cache the images\nin the viewer before start the preview")
+    param.setType(NatronEngine.StringParam.TypeEnum.eStringTypeLabel)
+    
+    #Add the param to the page
+    lastNode.userNatron.addParam(param)
+
+    #Set param properties
+    param.setHelp("")
+    param.setAddNewLine(False)
+    param.setEvaluateOnChange(False)
+    param.setAnimationEnabled(False)
+    lastNode.betterPreview = param
+    del param
+
+    # Create a tempfile within "ffplay pid"
+    param = lastNode.createFileParam("tmpFile", "Temp File")
+    param.setVisible(False)
+    tf = tempfile.NamedTemporaryFile(delete=False)
+    param.setDefaultValue(tf.name)
+    lastNode.tmpFile = param
+    del param
 
     # extra callback added
     app.AudioToAscii1.onParamChanged.set("AudioToAscii.paramHasChanged")    
