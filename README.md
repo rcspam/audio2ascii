@@ -26,7 +26,7 @@
 
 * Linux
 ```
-$ wget https://github.com/rcspam/audio2ascii/archive/v2.0beta.tar.gz
+$ wget https://github.com/rcspam/audio2ascii/archive/v2.0-linux.tar.gz
 $ tar xvzf audio2ascii-2.0.tar.gz
 $ cd audio2ascii-2.0beta
 $ ./install.sh
@@ -34,7 +34,7 @@ $ ./install.sh
 
 * MacOSX
 
-   Download [last version](https://github.com/rcspam/audio2ascii/archive/v2.0.tar.gz).
+   Download [last version](https://github.com/rcspam/audio2ascii/archive/v2.0-macosx.tar.gz).
 Decompress it where you want and launch './install.sh' from the decompress directory in a terminal
 
 * Windows
