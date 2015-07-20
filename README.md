@@ -27,7 +27,7 @@
 
 * Linux
 ```
-$ wget https://github.com/rcspam/audio2ascii/archive/v2.0-linux.tar.gz
+$ wget https://github.com/rcspam/audio2ascii/releases/download/v2.0/v2.0-linux64.tar.gz
 $ tar xvzf audio2ascii-2.0.tar.gz
 $ cd audio2ascii-2.0beta
 $ ./install.sh
@@ -35,12 +35,12 @@ $ ./install.sh
 
 * MacOSX
 
-   Download [last version](https://github.com/rcspam/audio2ascii/archive/v2.0-macosx.tar.gz).
+   Download [last version](https://github.com/rcspam/audio2ascii/releases/download/v2.0/v2.0-macosx.tar.gz).
 Decompress it where you want and launch './install.sh' from the decompress directory in a terminal
 
 * Windows
 
-   Download [last version](https://github.com/rcspam/audio2ascii/archive/v2.0-win.zip).
+   Download [last version](https://github.com/rcspam/audio2ascii/releases/download/v2.0/v2.0-win.zip).
 Open archive and copy all files in C:\Users\<username>\AppData\Local\INRIA\Natron\Plugins
 
 <u>Install some extras (Optional)</u>
