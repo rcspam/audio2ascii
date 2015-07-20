@@ -37,12 +37,12 @@ $ ./install_Unix.sh
 
    Download [last version](https://github.com/rcspam/audio2ascii/releases/download/v2.0/v2.0-macosx.tar.gz).
 Decompress it where you want and launch **'install_Unix.sh'** from the decompress directory in a terminal,
-or open archive and copy all files in **'/Users/<username>/Library/Application Support/INRIA/Natron/Plugins'**.
+or open archive and copy all files in **'/Users/\<username\>/Library/Application Support/INRIA/Natron/Plugins'**.
 
 * Windows
 
    Download [last version](https://github.com/rcspam/audio2ascii/releases/download/v2.0/v2.0-win.zip).
-   Open archive and copy all files in **'C:\Users\<username>\Local Settings\Application Data\INRIA\Natron\Plugins'**
+   Open archive and copy all files in **'C:\Users\\\<username\>\\Local Settings\Application Data\INRIA\Natron\Plugins'**
 
 <u>Install some extras (Optional)</u>
 
