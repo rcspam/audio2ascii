@@ -27,7 +27,7 @@ Decompress it where you want  and launch './install.sh' from the directory in te
 
 3.For Windows
 Download last version at https://github.com/rcspam/audio2ascii/releases/download/v2.0/v2.0-win.zip.
-Open archive and copy all files in 'C:\Users\<username>\AppData\Local\INRIA\Natron\Plugins'
+Open archive and copy all files in 'C:\Users\<username>\Local Settings\Application Data\INRIA\Natron\Plugins'
 
 4. Some extras (Optional):
 
