@@ -1,5 +1,9 @@
 # audio2ascii
-  Natron2.0 python plugin to animate you parameters with waveform from an audio file(mp3, wav,aiff,...).
+   ![frame](https://cloud.githubusercontent.com/assets/10021906/8639016/ce766e70-28cc-11e5-9c19-486f64b71992.png)
+
+ ![screenshot-2](https://cloud.githubusercontent.com/assets/10021906/8778111/35a9be00-2efc-11e5-828a-4fed9d3d266d.png)
+ 
+ Natron2.0 python plugin to animate you parameters with waveform from an audio file(mp3, wav,aiff,...).
   It can do a basic preview audio while viewer playing, this can be usefull [until a sound support](https://github.com/MrKepzie/Natron/issues/76#issuecomment-120059396) in future Natron versions (>2.0).
 
   An external app can be set and launch from the plugin to edit audio file (e.g. audacity..)
@@ -14,10 +18,7 @@
 
   Other videos in the [examples section](https://github.com/rcspam/audio2ascii/blob/master/README.md#examples) below.
 
- ![frame](https://cloud.githubusercontent.com/assets/10021906/8639016/ce766e70-28cc-11e5-9c19-486f64b71992.png)
 
-
- ![screenshot-2](https://cloud.githubusercontent.com/assets/10021906/8639230/a3a4e7f6-28d3-11e5-96e1-3e0490e6b9fe.png)
 
 
  For Windows users, a multiplatform Qt version of the bash script are currently being developed by [olear](https://github.com/olear/audiocurve)
