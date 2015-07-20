@@ -16,7 +16,7 @@ def getLabel():
     return "AudioToAscii"
 
 def getVersion():
-    return 1
+    return 2
 
 def getIconPath():
     return "AudioToAscii.png"
@@ -25,7 +25,7 @@ def getGrouping():
     return "Other"
 
 def getDescription():
-    return "Launch external bash script Audio2Ascii (only linux).\nIt convert audio file into ascii curve that you can import in the Natron curve editor.\You can download it at https://github.com/rcspam/audio2ascii)\nYou must have it in your $PATH."
+    return "Generate a curve from a waveforme audio file.\n\n Writen by @rcspam & @olear\nhttps://github.com/rcspam/audio2ascii\nhttps://github.com/olear/audiocurve"
     
 # Manage env vars
 # read environment vars in config file (in 'createInstance')
