@@ -2,7 +2,7 @@
    ![frame](https://cloud.githubusercontent.com/assets/10021906/8639016/ce766e70-28cc-11e5-9c19-486f64b71992.png)
 
  ![screenshot-2](https://cloud.githubusercontent.com/assets/10021906/8778111/35a9be00-2efc-11e5-828a-4fed9d3d266d.png)
- 
+
  Natron2.0 python plugin to animate you parameters with waveform from an audio file(mp3, wav,aiff,...).
   It can do a basic preview audio while viewer playing, this can be usefull [until a sound support](https://github.com/MrKepzie/Natron/issues/76#issuecomment-120059396) in future Natron versions (>2.0).
 
@@ -36,12 +36,12 @@ $ ./install.sh
 * MacOSX
 
    Download [last version](https://github.com/rcspam/audio2ascii/releases/download/v2.0/v2.0-macosx.tar.gz).
-Decompress it where you want and launch './install.sh' from the decompress directory in a terminal
+Decompress it where you want and launch **'./install.sh'** from the decompress directory in a terminal
 
 * Windows
 
    Download [last version](https://github.com/rcspam/audio2ascii/releases/download/v2.0/v2.0-win.zip).
-Open archive and copy all files in C:\Users\<username>\AppData\Local\INRIA\Natron\Plugins
+   Open archive and copy all files in **'C:\Users\<username>\Local Settings\Application Data\INRIA\Natron\Plugins'**
 
 <u>Install some extras (Optional)</u>
 
