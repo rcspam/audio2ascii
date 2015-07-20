@@ -27,36 +27,83 @@ def getGrouping():
 def getDescription():
     return "Launch external bash script Audio2Ascii (only linux).\nIt convert audio file into ascii curve that you can import in the Natron curve editor.\You can download it at https://github.com/rcspam/audio2ascii)\nYou must have it in your $PATH."
     
-# extra defs added
+# Manage env vars
+# read environment vars in config file (in 'createInstance')
+def read_init_file(env_file):
+    if not os.path.exists(env_file):
+        open(env_file, 'a').close()
+    env_list=[]
+    with open(env_file,"r") as file_env:
+        list_line = file_env.read().splitlines()
+    for line in list_line:
+        pair = line.split("=")
+        os.environ[pair[0]] = pair[1]
+        env_list.extend([pair[0], pair[1]])
+    return env_list
+# append a environment var to config file
+def set_env_var(env_file, env_var, env_val):
+    rm_env_var(env_file, env_var)
+    with open(env_file, 'a') as input_file:
+        input_file.write(env_var + "=" + env_val +"\n")
+    input_file.close()
+    return 1    
+# remove an environment var
+def rm_env_var(env_file, env_var):
+    with open(env_file,"r") as file_env:
+        lines = file_env.readlines()
+    file_env.close()
+    with open(env_file,"w") as file_env:
+        for line in lines:
+            if not str(env_var + "=") in line:
+                file_env.write(line)
+    file_env.close()
+# update config file
+def update_env(env_file, env_list, ENV_VAR, env_app):
+    if ENV_VAR in env_list:
+        if os.environ[ENV_VAR] != env_app:
+            if env_app == "":
+                rm_env_var(env_file, ENV_VAR)
+            elif env_app != "":
+                set_env_var(env_file, ENV_VAR, env_app)
+    elif env_app != "":
+        set_env_var(env_file, ENV_VAR, env_app)
+# /Manage env vars
 
+# Manage error
 def error_man(titleEM, messEM):
     NatronGui.natron.warningDialog(titleEM, messEM)
 
+# ffplay pid killer
 def kill_pid_player(tfKPP):
     pid_file_kpp = open(tfKPP, "r")
     pid = pid_file_kpp.readline()
     os.system("/bin/kill " + pid)
     pid_file_kpp.close()
 
-# 'Convert audio to ascii' function
+# Convert audio to ascii
 def audioToAscii(audioFileATA, asciiFileATA, dimATA, fpsATA, durationATA, xHeightATA, yHeightATA):
     # Linux & OSX
-    if NatronEngine.natron.isUnix():
+    if NatronEngine.natron.isMacOSX():
         exec_file = "/audio2ascii.sh"
-        # complet path
-        path_a2a = str(os.path.dirname(os.path.realpath(__file__)) + exec_file).replace(" ", "\ ")
-        # set audio File & ascii file
+        # complet path (.replace space need by OSX!?) 
+        path_a2a = str(os.path.dirname(os.path.realpath(__file__)) + exec_file).replace(" ", "\ ") # strage need to remove 'replace' for path configfile on MacOSX
+        # set input and output files
         files_a2a = str("'" + str(audioFileATA) + "' '" + str(asciiFileATA) + "'")
         # set param
         param_a2a = str(dimATA) + " " +  str(fpsATA) + " " +  str(durationATA) + " " +  str(xHeightATA)  + " " + str(yHeightATA)
-        # audio2ascii.sh exist in local plugin path ?
+    # Linux
+    elif NatronEngine.natron.isLinux():
+        exec_file = "/AudioCurve"
+        path_a2a = str(os.path.dirname(os.path.realpath(__file__)) + exec_file).replace(" ", "\ ")
+        files_a2a = "-input \""+str(audioFileATA)+"\" -output \""+str(asciiFileATA)+"\""
+        param_a2a = "-"+str(dimATA)+" -fps "+str(fpsATA)+" -frames "+str(durationATA)+" -cX "+str(xHeightATA)+" -cY "+str(yHeightATA)
     # Windows
     elif NatronEngine.natron.isWindows():
         exec_file = "/AudioCurve.exe"
         path_a2a = str(os.path.dirname(os.path.realpath(__file__))) + exec_file
         files_a2a = "-input \""+str(audioFileATA)+"\" -output \""+str(asciiFileATA)+"\""
         param_a2a = "-"+str(dimATA)+" -fps "+str(fpsATA)+" -frames "+str(durationATA)+" -cX "+str(xHeightATA)+" -cY "+str(yHeightATA)
-
+    #audio2ascii.sh exist in local plugin path ?
     if os.path.exists(os.path.dirname(os.path.realpath(__file__)) + exec_file):
         # Launch audio2ascii
         ret_a2a = os.system(path_a2a + " " + files_a2a + " " + param_a2a )
@@ -65,10 +112,9 @@ def audioToAscii(audioFileATA, asciiFileATA, dimATA, fpsATA, durationATA, xHeigh
         error_man(exec_file, "'" + exec_file + "' not found !   \n\nRe-install it in '" + path_a2a + "'")
         return 1
 
-
-# 'Generate the animate curves' function
+# Generate animate curves
 def animCurves(thisParam, fileAC, dimAC, fpsAC, durationAC ,frameStartAC):
-    # ascii file
+    # open ascii file
     asciiAC = open(fileAC, "r")
     # end frame
     lineAC = int(fpsAC) * int(durationAC) + int(frameStartAC)
@@ -77,14 +123,14 @@ def animCurves(thisParam, fileAC, dimAC, fpsAC, durationAC ,frameStartAC):
         # reset x before recalculate
         thisParam.removeAnimation(0)
         for frameC in range(int(frameStartAC),lineAC):
-            x, y = asciiAC.readline().split ("_")
+            x = asciiAC.readline()
             thisParam.setValueAtTime(float(x), frameC, 0)
     # anim y
     elif dimAC == 1:
         # reset y before recalculate
         thisParam.removeAnimation(1)
         for frameC in range(int(frameStartAC),lineAC):
-            x, y = asciiAC.readline().split ("_")
+            y = asciiAC.readline()
             thisParam.setValueAtTime(float(y), frameC, 1)
     # anim yx
     elif dimAC == 2:
@@ -97,58 +143,64 @@ def animCurves(thisParam, fileAC, dimAC, fpsAC, durationAC ,frameStartAC):
             thisParam.setValueAtTime(float(y), frameC, 1)
     asciiAC.close()
 
-    
-
 def paramHasChanged(thisParam, thisNode, thisGroup, app, userEdited):
+
+    # Read config file
+    config_file = str(os.path.dirname(os.path.realpath(__file__)) + "/AudioToAscii.config") #.replace(" ", "\ ") strange here remove for MacOSX needed line in AudioToAscii function
+    env_list = read_init_file(config_file)
+
     # audio input file
     audio_file = thisNode.inputFile.get()
     # ascii output file
     ascii_file = thisNode.curveFile.get()
+    
     # external editing app
     ext_edit_app = thisNode.editApp.get()
     ext_edit_app_param = thisNode.editParam.get()
-    
-    tmp_file = thisNode.tmpFile.get()
-    
-    # update to current project frame rate
-    #if thisParam == thisNode.currentFrameRate or thisNode.autoFR.get():
-    if thisNode.autoFR.get():
-        thisNode.framesPerSec.setEnabled(False)
-        thisNode.framesPerSec.set(app.frameRate.get())
-    else:
-        thisNode.framesPerSec.setEnabled(True)
-    
-    # update start at current frame
-    if thisParam == thisNode.currentFrame:
-        thisNode.atFrameNum.set(app.timelineGetTime())
-    
-    # convert dimension in comprehensive thing for audio2ascii script 
-    dim = thisNode.dimEnsion.get()
-    if dim == 0:
-        dimension = "x"
-    elif dim == 1:
-        dimension = "y"
-    elif dim == 2:
-        dimension = "xy" 
-    
+    audio_editor = "'" + thisNode.editApp.get() + "' " + thisNode.editParam.get()
+
+    # check or set external editing app in config file
+    update_env(config_file, env_list, "A2A_AUDIO_EDITOR",ext_edit_app)
+    update_env(config_file, env_list, "A2A_AUDIO_EDITOR_PARAM",ext_edit_app_param)
+
     # edit with External app
     if audio_file and ext_edit_app and thisParam == thisNode.editAudio:
-        # On Linux and Osx
-        if NatronEngine.natron.isUnix():
-            if os.path.exists(ext_edit_app):
-                os.system(ext_edit_app + " " + ext_edit_app_param + " '" + audio_file + "' &")
-            else:
-                error_man("Audio Editor", "'" + ext_edit_app + "' not found !\n\nSet an audio editor complet path.")
-        if NatronEngine.natron.isWindows():
-            # add verif and executable for windows here
-            NatronGui.natron.warningDialog("Unix Only", "Sorry, this plugin works only on Linux and Mas Osx !")
+        if os.path.exists(ext_edit_app):
+            # Linux and Osx
+            if NatronEngine.natron.isUnix():
+                os.system(audio_editor + " '" + audio_file + "' &")
+            # Windows
+            if NatronEngine.natron.isWindows():
+                os.system(os.path.realpath(ext_edit_app) + " " + ext_edit_app_param + " '" + audio_file + "'")
+        else:
+            error_man("Audio Editor", "'" + ext_edit_app + "' not found !\n\nSet an audio editor complet path.")
     # no editor path set
     else:
         if not ext_edit_app and thisParam == thisNode.editAudio:
             error_man("Audio Editor", "You need to set a audio editor !\n\nUnfold group below and fill the editor settings.")
         if not audio_file and thisParam == thisNode.editAudio:
             error_man("Audio Editor", "You need to set a audio file before edit it !")
-    
+
+    # convert dimension for audio2ascii.sh/audiocurve
+    dim = thisNode.dimEnsion.get()
+    if dim == 0:
+        dimension = "x"
+    elif dim == 1:
+        dimension = "y"
+    elif dim == 2:
+        dimension = "xy"
+
+    # Auto-update with current project frame rate if check
+    if thisNode.autoFR.get():
+        thisNode.framesPerSec.setEnabled(False)
+        thisNode.framesPerSec.set(app.frameRate.get())
+    else:
+        thisNode.framesPerSec.setEnabled(True)
+
+    # update start at current frame
+    if thisParam == thisNode.currentFrame:
+        thisNode.atFrameNum.set(app.timelineGetTime())
+
     # Import Curve # add verif param set !!!!
     if ascii_file and audio_file and thisParam == thisNode.importCurve:
         ret_exec = audioToAscii(audio_file, ascii_file, dimension, int(thisNode.framesPerSec.get()), thisNode.duraTion.get(), thisNode.xHeight.get(), thisNode.yHeight.get())
@@ -161,17 +213,22 @@ def paramHasChanged(thisParam, thisNode, thisGroup, app, userEdited):
         error_man("Audio File", "No Audio File set !\n\nYou need to set a input audio file path before generate the curves.")
     if not ascii_file and thisParam == thisNode.importCurve:
         error_man("Curve File", "No Curve File set !\n\nYou need to set a output curve file path before generate the curves.")
+
     # Reset the curve
     if thisParam == thisNode.resetCurves:
         thisNode.curveIn.removeAnimation(0)
         thisNode.curveIn.removeAnimation(1)
+
+    # ffplay pid tmp file
+    tmp_file = thisNode.tmpFile.get()
 
     # play preview
     if thisParam == thisNode.playSync:
         if audio_file and tmp_file:
             # stop viewer & ffplay if playing
             kill_pid_player(tmp_file)
-            # Some init fyor the Viewer
+            # Some init for the Viewer
+            #### add auto-turbo check ######
             app.pane1.Viewer1.setPlaybackMode(NatronEngine.Natron.PlaybackModeEnum(0))
             app.pane1.Viewer1.setFrameRange(thisNode.atFrameNum.get(), thisNode.duraTion.get() -1 + thisNode.atFrameNum.get())
             # calculate ffplay duration loop
@@ -202,6 +259,10 @@ def paramHasChanged(thisParam, thisNode, thisGroup, app, userEdited):
 ## / extra defs
 
 def createInstance(app,group):
+    
+    # Read variables in config file
+    config_file = str(os.path.dirname(os.path.realpath(__file__)) + "/AudioToAscii.config") #.replace(" ", "\ ") strange here remove for MacOSX
+    env_list = read_init_file(config_file)
 
     #Create all nodes in the group
     lastNode = app.createNode("fr.inria.built-in.Output", 1, group)
@@ -311,7 +372,12 @@ def createInstance(app,group):
     param.setHelp("Set the audio editor path")
     param.setAddNewLine(True)
     param.setAnimationEnabled(False)
-    param.setDefaultValue("/usr/bin/audacity")
+    # check fefault app in config file
+    if env_list and "A2A_AUDIO_EDITOR" in env_list:
+        def_editor = os.environ['A2A_AUDIO_EDITOR']
+    else:
+        def_editor = ""
+    param.setDefaultValue(def_editor)
     lastNode.editApp = param
     del param
 
@@ -324,9 +390,14 @@ def createInstance(app,group):
 
     #Set param properties
     param.setHelp("Set the audio editor command line parameters")
-    param.setVisible(True)
     param.setAddNewLine(False)
-    param.setAnimationEnabled(True)
+    param.setAnimationEnabled(False)
+    # check fefault app in config file
+    if "A2A_AUDIO_EDITOR_PARAM" in env_list:
+        def_editor_param = os.environ['A2A_AUDIO_EDITOR_PARAM']
+    else:
+        def_editor_param = ""
+    param.setDefaultValue(def_editor_param)
     lastNode.editParam = param
     del param
     # / Group
@@ -385,19 +456,6 @@ def createInstance(app,group):
     param.setAnimationEnabled(True)
     lastNode.framesPerSec = param
     del param
-
-    #param = lastNode.createButtonParam("currentFrameRate", "current Frame Rate")
-
-    ##Add the param to the page
-    #lastNode.userNatron.addParam(param)
-
-    ##Set param properties
-    #param.setHelp("Update to current project frame rate manually")
-    #param.setAddNewLine(False)
-    #param.setPersistant(False)
-    #param.setEvaluateOnChange(False)
-    #lastNode.currentFrameRate = param
-    #del param
 
     param = lastNode.createBooleanParam("autoFR", "Auto")
     param.setDefaultValue(1)
@@ -537,7 +595,7 @@ def createInstance(app,group):
     param = lastNode.createStringParam("viewerAudio", "Preview Viewer/Audio")
     param.setType(NatronEngine.StringParam.TypeEnum.eStringTypeLabel)
 
-    	#Add the param to the page
+    #Add the param to the page
     lastNode.userNatron.addParam(param)
 
     #Set param properties
@@ -554,7 +612,7 @@ def createInstance(app,group):
     lastNode.userNatron.addParam(param)
 
     #Set param properties
-    param.setHelp("Start preview  Viewer/Audio\nFor a better sync, Play/Cache the images in the viewer before preview")
+    param.setHelp("Start a preview Viewer/Audio\nFor a good sync, Play/Cache the images in the viewer before start the preview")
     param.setAddNewLine(True)
     param.setPersistant(False)
     param.setEvaluateOnChange(False)
@@ -574,7 +632,7 @@ def createInstance(app,group):
     lastNode.stopSync = param
     del param
 
-    param = lastNode.createStringParam("betterPreview", "It's better to Play/Cache the images\nin the viewer before start the preview")
+    param = lastNode.createStringParam("betterPreview", "For a good sync, play/cache the images\nin the viewer before start the preview")
     param.setType(NatronEngine.StringParam.TypeEnum.eStringTypeLabel)
     
     #Add the param to the page
@@ -595,6 +653,7 @@ def createInstance(app,group):
     param.setDefaultValue(tf.name)
     lastNode.tmpFile = param
     del param
+    # /FFPLAY --------
 
     # extra callback added
     app.AudioToAscii1.onParamChanged.set("AudioToAscii.paramHasChanged")    
