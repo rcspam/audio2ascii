@@ -19,11 +19,12 @@ Just copy audio2ascii.sh, AudioToAscii.py and AudioToAscii.png in your Home Natr
 $ wget https://github.com/rcspam/audio2ascii/releases/download/v2.0/v2.0-linux.tar.gz
 $ tar xvzf audio2ascii-2.0.tar.gz
 $ cd audio2ascii-2.0beta
-$ ./install.sh
+$ ./install_Unix.sh
 
 2. For OSX
 Download last version at https://github.com/rcspam/audio2ascii/releases/download/v2.0/v2.0-macosx.tar.gz.
-Decompress it where you want  and launch './install.sh' from the directory in terminal
+Decompress it where you want  and launch './install_Unix.sh' from the directory in terminal,
+or open archive and copy all files in '/Users/<username>/Library/Application Support/INRIA/Natron/Plugins'.
 
 3.For Windows
 Download last version at https://github.com/rcspam/audio2ascii/releases/download/v2.0/v2.0-win.zip.
