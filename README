@@ -4,41 +4,12 @@ Natron2.0 python plugin to animate you parameters with waveform from an audio fi
 
 It try to preview audio while viewer playing. it can be usefull until the basic sound support in future Natron versions (>2.0).
 
-An external app can be set and launch from the plugin to edit audio file (e.g. audacity..)
+An external app can be set and launch from the plugin to edit audio file (e.g. audacity..).
 
-The plugin use a bash script(audio2ascii.sh), sox to convert audio and ffplay(from ffpmeg) to play the preview.
+The plugin use a bash script(audio2ascii.sh), sox to convert audio and ffplay(from ffpmeg) to play the preview.(only for OSX and Linux for now).
 
 A multiplatform Qt version of the bash script are currently being developed by @olear at:
 https://github.com/olear/audiocurve
-
-
-Requirements:
-============
-
--   sox:
-
-       sudo apt-get install sox or sudo yum install sox.(Debian / Fedora)
-
-       For support more audio formats than 'wav': sudo apt-get install libsox-fmt-all (debian).
-
-       Fedora: for mp3 support for sox you can read:
-         https://unix.stackexchange.com/questions/98524/sox-returns-an-error-when-i-try-to-handle-mp3-fileshttps://unix.stackexchange.com/questions/98524/sox-returns-an-error-when-i-try-to-handle-mp3-files
-
-       Mac OSX: sudo port install sox (After have installed Xcode and Command Line Tools)
-
--   ffmpeg
-
-       Debian/Ubuntu: sudo apt-get install ffmpeg or sudo yum install ffmpeg
-
-       Mac OSX: sudo port install ffmpeg
-
--   gawk (OSX users only, awk doesn't support floats): sudo port install gawk
-
--   yad (optional, stand alone GUI on Linux):
-
-      Debian/Ubuntu: sudo apt-get install yad
-
-      Fedora:sudo yum install yad
 
 Installation / Usage:
 ====================
@@ -54,10 +25,11 @@ $ ./install.sh
 Download last version at https://github.com/rcspam/audio2ascii/archive/v2.0beta.tar.gz.
 Decompress it where you want  and launch './install.sh' from the directory in terminal
 
-3.For Windows (@Olear [AudioCurve binaries](https://github.com/olear/audiocurve))
-Ongoing works !
+3.For Windows
+Download last version at https://github.com/rcspam/audio2ascii/archive/v2.0-win.zip).
+Open archive and copy all files in 'C:\Users\<username>\AppData\Local\INRIA\Natron\Plugins'
 
-3. Some extras (Optional):
+4. Some extras (Optional):
 
 - If you want add a menu command to the Natron menu-bar, add the following lines in the init.py of your home Natron plugin directory (create it if doesn't exist):
 
@@ -73,7 +45,36 @@ Ongoing works !
     os.system("$HOME/Library/Application\ Support/INRIA/Natron/Plugins/audio2ascii.sh -g &")
    NatronGui.natron.addMenuCommand("Ext-Tools/AudioToAscii","audioToAscii",QtCore.Qt.Key.Key_L,QtCore.Qt.KeyboardModifier.ShiftModifier)
 
-
  - Linux users can run audio2ascii.sh as standalone to create ascii curves (yad must be installed)
 
    $ your/path/to/audio2ascii.sh -g
+
+Requirements:
+============
+
+-   sox:
+
+       sudo apt-get install sox or sudo yum install sox.(Debian / Fedora)
+
+       For support more audio formats than 'wav': sudo apt-get install libsox-fmt-all (debian).
+
+       Fedora: for mp3 support for sox you can read:
+         https://unix.stackexchange.com/questions/98524/sox-returns-an-error-when-i-try-to-handle-mp3-fileshttps://unix.stackexchange.com/questions/98524/sox-returns-an-error-when-i-try-to-handle-mp3-files
+
+       Mac OSX: sudo port install sox (After have installed Xcode and Command Line Tools)
+
+       No needed for Widows users
+
+-   ffmpeg
+
+       Debian/Ubuntu: sudo apt-get install ffmpeg or sudo yum install ffmpeg
+
+       Mac OSX: sudo port install ffmpeg
+
+-   gawk (OSX users only, awk doesn't support floats): sudo port install gawk
+
+-   yad (optional, stand alone GUI on Linux):
+
+      Debian/Ubuntu: sudo apt-get install yad
+
+      Fedora:sudo yum install yad
