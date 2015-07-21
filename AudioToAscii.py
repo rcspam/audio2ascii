@@ -100,13 +100,13 @@ def audioToAscii(audioFileATA, asciiFileATA, dimATA, fpsATA, durationATA, xHeigh
     # Windows
     elif NatronEngine.natron.isWindows():
         exec_file = "/AudioCurve.exe"
-        path_a2a = str(os.path.dirname(os.path.realpath(__file__))) + exec_file
-        files_a2a = "-input \""+str(audioFileATA)+"\" -output \""+str(asciiFileATA)+"\""
+        path_a2a = str(os.path.dirname(os.path.realpath(__file__)) + exec_file)
+        files_a2a = "-input '"+str(audioFileATA)+"' -output '"+str(asciiFileATA)+"'"
         param_a2a = "-"+str(dimATA)+" -fps "+str(fpsATA)+" -frames "+str(durationATA)+" -cX "+str(xHeightATA)+" -cY "+str(yHeightATA)
     #audio2ascii.sh exist in local plugin path ?
     if os.path.exists(os.path.dirname(os.path.realpath(__file__)) + exec_file):
         # Launch audio2ascii
-        ret_a2a = os.system(path_a2a + " " + files_a2a + " " + param_a2a )
+        ret_a2a = os.system(path_a2a + " " + files_a2a + " " + param_a2a)
         return ret_a2a
     else:
         error_man(exec_file, "'" + exec_file + "' not found !   \n\nRe-install it in '" + path_a2a + "'")
@@ -171,7 +171,7 @@ def paramHasChanged(thisParam, thisNode, thisGroup, app, userEdited):
                 os.system(audio_editor + " '" + audio_file + "' &")
             # Windows
             if NatronEngine.natron.isWindows():
-                os.system(os.path.realpath(ext_edit_app) + " " + ext_edit_app_param + " '" + audio_file + "'")
+                os.system(os.path.realpath(ext_edit_app) + " " + ext_edit_app_param + " \"" + audio_file + "\"")
         else:
             error_man("Audio Editor", "'" + ext_edit_app + "' not found !\n\nSet an audio editor complet path.")
     # no editor path set
@@ -235,7 +235,7 @@ def paramHasChanged(thisParam, thisNode, thisGroup, app, userEdited):
             duration_loop = (thisNode.duraTion.get() -1) / thisNode.framesPerSec.get()
             # verify if ffplay is installed and start it
             if NatronEngine.natron.isLinux() and not os.system("which ffplay"):
-                os.system("ffplay -nodisp '" + str(audio_file) + "' -t " + str(duration_loop) + " -loop 0  & echo $! >" + tmp_file)
+                os.system("ffplay -nodisp \"" + str(audio_file) + "\" -t " + str(duration_loop) + " -loop 0  & echo $! >" + tmp_file)
             elif NatronEngine.natron.isMacOSX() and os.path.exists("/opt/local/bin/ffplay"):
                 os.system("/opt/local/bin/ffplay -nodisp '" + str(audio_file) + "' -t " + str(duration_loop) + " -loop 0  & echo $! >" + tmp_file)
             elif NatronEngine.natron.isWindows():
@@ -616,6 +616,7 @@ def createInstance(app,group):
     param.setAddNewLine(True)
     param.setPersistant(False)
     param.setEvaluateOnChange(False)
+    param.setIconFilePath(os.path.dirname(os.path.realpath(__file__)) + "/play.png")
     lastNode.playSync = param
     del param
 
@@ -629,6 +630,7 @@ def createInstance(app,group):
     param.setAddNewLine(False)
     param.setPersistant(False)
     param.setEvaluateOnChange(False)
+    param.setIconFilePath(os.path.dirname(os.path.realpath(__file__)) + "/stop.png")
     lastNode.stopSync = param
     del param
 
