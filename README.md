@@ -75,7 +75,9 @@ Some short videos released with the [Natron 2 Snapshot](http://sourceforge.net/p
 * [Test1.mp4](https://dl.dropboxusercontent.com/u/2677320/test1.mp4) ( x curve on scale)
 * [Test2.mp4](https://dl.dropboxusercontent.com/u/2677320/test2.mp4) ( xy curves (stereo) with x translate on left channel,  y translate on right channel )
 * [Test3.mp4](https://dl.dropboxusercontent.com/u/2677320/test3.mp4) (y curve on y translate)
+* [Tuto/Demo](https://www.youtube.com/watch?v=koagSOPnsVw) (animate a rotopaint point on music)
 
+ 
 #Requirements
 
  * [sox](http://sox.sourceforge.net/):
