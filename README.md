@@ -4,30 +4,25 @@
  ![screenshot-2](https://cloud.githubusercontent.com/assets/10021906/8778111/35a9be00-2efc-11e5-828a-4fed9d3d266d.png)
 
  Natron2.0 python plugin to animate you parameters with waveform from an audio file(mp3, wav,aiff,...).
-  It can do a basic preview audio while viewer playing, this can be usefull [until a sound support](https://github.com/MrKepzie/Natron/issues/76#issuecomment-120059396) in future Natron versions (>2.0).
+  It can do a basic preview audio while viewer playing (only OSX and Linux for now), this can be usefull [until a sound support](https://github.com/MrKepzie/Natron/issues/76#issuecomment-120059396) in future Natron versions (>2.0).
 
-  An external app can be set and launch from the plugin to edit audio file (e.g. audacity..)
+  An external app can be set and launch directly from the plugin to edit audio files (e.g. audacity..)
 
   The plugin use [AudioCurve](https://github.com/olear/audiocurve) written by [@olear](https://github.com/olear)  on Linux and Windows, and a bash script(audio2ascii.sh) on MacOSX.
 
-  [sox](http://sox.sourceforge.net/) is use to convert audio.  
-  ffplay(from [ffmpeg](http://www.ffmpeg.org/)) to play the preview (only for OSX and Linux for now).
-
+  [sox](http://sox.sourceforge.net/) is use to convert audio.
+  
+  ffplay(from [ffmpeg](http://www.ffmpeg.org/)) to play the preview.
 
   [Here is a Demo/tuto](https://www.youtube.com/watch?v=koagSOPnsVw).
 
   Other videos in the [examples section](https://github.com/rcspam/audio2ascii/blob/master/README.md#examples) below.
 
-
-
-
- For Windows users, a multiplatform Qt version of the bash script are currently being developed by [olear](https://github.com/olear/audiocurve)
-
 #Installation / Usage
 
 * Linux
 ```
-$ wget https://github.com/rcspam/audio2ascii/releases/download/v2.0/v2.0-linux64.tar.gz
+$ wget https://github.com/rcspam/audio2ascii/releases/download/v2.0.1/v2.1-linux64.tar.gz
 $ tar xvzf audio2ascii-2.0.tar.gz
 $ cd audio2ascii-2.0beta
 $ ./install_Unix.sh
@@ -35,13 +30,13 @@ $ ./install_Unix.sh
 
 * MacOSX
 
-   Download [last version](https://github.com/rcspam/audio2ascii/releases/download/v2.0/v2.0-macosx.tar.gz).
+   Download [last version](https://github.com/rcspam/audio2ascii/releases/download/v2.0.1/v2.1-macosx.tar.gz).
 Decompress it where you want and launch **'install_Unix.sh'** from the decompress directory in a terminal,
 or open archive and copy all files in **'/Users/\<username\>/Library/Application Support/INRIA/Natron/Plugins'**.
 
 * Windows
 
-   Download [last version](https://github.com/rcspam/audio2ascii/releases/download/v2.0/v2.0-win.zip).
+   Download [last version](https://github.com/rcspam/audio2ascii/releases/download/v2.0.1/v2.1-win.zip).
    Open archive and copy all files in **'C:\Users\\\<username\>\\Local Settings\Application Data\INRIA\Natron\Plugins'**
 
 <u>Install some extras (Optional)</u>
@@ -86,9 +81,9 @@ Some short videos released with the [Natron 2 Snapshot](http://sourceforge.net/p
 
     - <u>Fedora:</u> for mp3 support for sox you can read [this](https://unix.stackexchange.com/questions/98524/sox-returns-an-error-when-i-try-to-handle-mp3-files)
 
-    - <u>Mac OSX:</u> **sudo port install sox** (After have installed [Xcode](https://developer.apple.com/download) and [Command Line Tools](https://developer.apple.com/download))
+    - <u>Mac OSX:</u> **sudo port install lame**(mp3 support) and **sudo port install sox** (After have installed [Xcode](https://developer.apple.com/download) and [Command Line Tools](https://developer.apple.com/download))
 
-    - No needed for <u>Widows users</u>
+    - <u>Widows</u>: Sox is include, so no need to install it but the official SoX Windows binaries can't play 'mp3' due to license restrictions. If you realy need to use it, you have to include [libmad.dll](http://ossbuild.googlecode.com/svn/trunk/Shared/Build/Windows/Win32/bin/libmad-0.dll) and [libmp3lame.dll](http://ossbuild.googlecode.com/svn/trunk/Shared/Build/Windows/Win32/bin/libmp3lame-0.dll) in the audio2ascii plugin directory (the same as sox.exe).
 
  * [ffmpeg](http://www.ffmpeg.org/):
 
