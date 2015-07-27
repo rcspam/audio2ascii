@@ -1,5 +1,5 @@
 # audio2ascii
-   ![frame](https://cloud.githubusercontent.com/assets/10021906/8639016/ce766e70-28cc-11e5-9c19-486f64b71992.png)
+   ![frame](https://cloud.githubusercontent.com/assets/10021906/8899999/50eb0540-343b-11e5-9d9b-63ceb5a540b6.png)
 
  ![screenshot-2](https://cloud.githubusercontent.com/assets/10021906/8778111/35a9be00-2efc-11e5-828a-4fed9d3d266d.png)
 
