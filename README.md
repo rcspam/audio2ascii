@@ -18,7 +18,7 @@
 
   Other videos in the [examples section](https://github.com/rcspam/audio2ascii/blob/master/README.md#examples) below.
 
-#Installation / Usage
+#Installation
 
 * Linux
 ```
