@@ -83,7 +83,7 @@ Some short videos released with the [Natron 2 Snapshot](http://sourceforge.net/p
 
     - <u>Mac OSX:</u> **sudo port install lame**(mp3 support) and **sudo port install sox** (After have installed [Xcode](https://developer.apple.com/download) and [Command Line Tools](https://developer.apple.com/download))
 
-    - <u>Widows</u>: Sox is include, so no need to install it but the official SoX Windows binaries can't play 'mp3' due to license restrictions.
+    - <u>Windows</u>: Sox is include, so no need to install it but the official SoX Windows binaries can't play 'mp3' due to license restrictions.
 
  * [ffmpeg](http://www.ffmpeg.org/):
 
