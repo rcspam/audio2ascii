@@ -26,7 +26,8 @@ def getGrouping():
 
 def getDescription():
     return "Generate a curve from a waveforme audio file.\n\n Writen by @rcspam & @olear\nhttps://github.com/rcspam/audio2ascii\nhttps://github.com/olear/audiocurve"
-    
+
+# extra defs   
 # Manage env vars
 # read environment vars in config file (in 'createInstance')
 def read_init_file(env_file):
@@ -143,14 +144,19 @@ def animCurves(thisParam, fileAC, dimAC, fpsAC, durationAC ,frameStartAC):
             thisParam.setValueAtTime(float(y), frameC, 1)
     asciiAC.close()
 
+
+
 def paramHasChanged(thisParam, thisNode, thisGroup, app, userEdited):
     # Read config file
     config_file = str(os.path.dirname(os.path.realpath(__file__)) + "/audio2ascii/AudioToAscii.config") #.replace(" ", "\ ") strange here remove for MacOSX needed line in AudioToAscii function
     env_list = read_init_file(config_file)
-
+    
+    # Is Node disabled ?
+    node_disable = thisNode.disableNode.get()
     # audio input file
     audio_file = thisNode.inputFile.get()
     # ascii output file
+    global ascii_file
     ascii_file = thisNode.curveFile.get()
     
     # external editing app
@@ -219,11 +225,12 @@ def paramHasChanged(thisParam, thisNode, thisGroup, app, userEdited):
         thisNode.curveIn.removeAnimation(1)
 
     # ffplay pid tmp file
+    global tmp_file
     tmp_file = thisNode.tmpFile.get()
 
     # play preview
     if thisParam == thisNode.playSync:
-        if audio_file and tmp_file:
+        if audio_file and tmp_file and node_disable == False:
             # stop viewer & ffplay if playing
             kill_pid_player(tmp_file)
             # Some init for the Viewer
@@ -246,11 +253,13 @@ def paramHasChanged(thisParam, thisNode, thisGroup, app, userEdited):
             app.pane1.Viewer1.seek(thisNode.atFrameNum.get())
             app.pane1.Viewer1.startForward()
             thisNode.playSync.setIconFilePath(os.path.dirname(os.path.realpath(__file__)) + "/audio2ascii/play_enabled.png")
+        elif node_disable == True:
+            error_man("Audio2Ascii", "Audio2Ascii Node is diabled !")
         else:
-            error_man("Audio Editor", "You need to set a audio file before preview !")
+            error_man("Audio File", "You need to set a audio file before preview !")
         thisNode.refreshUserParamsGUI()
     # Stop preview
-    if thisParam == thisNode.stopSync:
+    if thisParam == thisNode.stopSync or node_disable == True:
         if tmp_file:
             kill_pid_player(tmp_file)
             app.pane1.Viewer1.pause()
@@ -258,7 +267,21 @@ def paramHasChanged(thisParam, thisNode, thisGroup, app, userEdited):
         else:
             error_man("Audio Editor", "You need to set a audio file before preview !")
         thisNode.refreshUserParamsGUI()
-## / extra defs
+
+# Some stuff to do before deleted an AudiToAscii node
+def beforeNodeDeleted(thisNode, app):
+    app.pane1.Viewer1.pause()
+    kill_pid_player(tmp_file)
+    os.remove(tmp_file)
+    os.remove(ascii_file)
+
+# Some stuff to do before close project within AudiToAscii node(s)
+def beforeProjectClose(app):
+    kill_pid_player(tmp_file)
+    os.remove(tmp_file)
+    os.remove(ascii_file)
+
+# / extra defs
 
 def createInstance(app,group):
     
@@ -287,7 +310,6 @@ def createInstance(app,group):
         del param
 
     del lastNode
-
 
     lastNode = app.createNode("fr.inria.built-in.Input", 1, group)
     lastNode.setScriptName("Input1")
@@ -529,7 +551,7 @@ def createInstance(app,group):
     param.setEvaluateOnChange(False)
     lastNode.importCurve = param
     del param
-    
+
     param = lastNode.createDouble2DParam("curveIn", "Curve ")
     param.setMinimum(-2.14748e+09, 0)
     param.setMaximum(2.14748e+09, 0)
@@ -559,7 +581,7 @@ def createInstance(app,group):
     lastNode.resetCurves = param
     del param
 
-    # FFPLAY -------- Since find solution for 'backgrounded' ffplay on windows !!
+    # FFPLAY -------- Since find solution for 'backgrounded' ffplay on windows ! If there is one !!
     if not NatronEngine.natron.isWindows():
         param = lastNode.createStringParam("viewerAudio", "Preview Viewer/Audio")
         param.setType(NatronEngine.StringParam.TypeEnum.eStringTypeLabel)
@@ -572,7 +594,7 @@ def createInstance(app,group):
         param.setAnimationEnabled(False)
         lastNode.viewerAudio = param
         del param
-    
+
         param = lastNode.createButtonParam("playSync", "\u25b6")
         #Add the param to the page
         lastNode.userNatron.addParam(param)
@@ -585,7 +607,7 @@ def createInstance(app,group):
         #param.setIconFilePath("audio2ascii/play.png") # decomment when Natron 2.0 stable is out 
         lastNode.playSync = param
         del param
-    
+
         param = lastNode.createButtonParam("stopSync", "\u25a0")
         #Add the param to the page
         lastNode.userNatron.addParam(param)
@@ -598,7 +620,7 @@ def createInstance(app,group):
         #param.setIconFilePath("audio2ascii/stop.png") # decomment when Natron 2.0 stable is out
         lastNode.stopSync = param
         del param
-    
+
         param = lastNode.createStringParam("betterPreview", "For a good sync, play/cache the images\nin the viewer before start the preview")
         param.setType(NatronEngine.StringParam.TypeEnum.eStringTypeLabel)
         #Add the param to the page
@@ -610,23 +632,27 @@ def createInstance(app,group):
         param.setAnimationEnabled(False)
         lastNode.betterPreview = param
         del param
-    
+
         # Create a tempfile within "ffplay pid"
         param = lastNode.createFileParam("tmpFile", "Temp File")
         param.setVisible(False)
-        tf = tempfile.NamedTemporaryFile(delete=False)
+        tf = tempfile.NamedTemporaryFile(suffix='tmp', prefix='a2a_ffplay_', delete=False)
         param.setDefaultValue(tf.name)
         lastNode.tmpFile = param
         del param
     # /FFPLAY --------
 
     # extra callback added
-    app.AudioToAscii1.onParamChanged.set("AudioToAscii.paramHasChanged")    
-    
+    app.AudioToAscii1.onParamChanged.set("AudioToAscii.paramHasChanged") 
+    # kill ffplay when remove node ...
+    app.AudioToAscii1.beforeNodeRemoval.set("AudioToAscii.beforeNodeDeleted")
+    # ... or close app.
+    app.beforeProjectClose.set("AudioToAscii.beforeProjectClose")
+    # /extra callback added
+
     #Refresh the GUI with the newly created parameters
     lastNode.refreshUserParamsGUI()
     del lastNode
 
     #Now that all nodes are created we can connect them together, restore expressions
     groupOutput1.connectInput(0, groupInput1)
-
