@@ -22,23 +22,22 @@
 
 * Linux
 ```
-$ wget https://github.com/rcspam/audio2ascii/releases/download/v2.0.1/v2.1-linux64.tar.gz
-$ tar xvzf audio2ascii-2.0.tar.gz
-$ cd audio2ascii-2.0beta
+$ wget https://github.com/rcspam/audio2ascii/releases/download/v2.0.2/Audio2ascii-2.0.2-Linux64.tar.gz
+$ tar xvzf Audio2ascii-2.0.2-Linux64.tar.gz
+$ cd Audio2ascii-2.0.2-Linux64
 $ ./install_Unix.sh
 ```
 
 * MacOSX
 
-   Download [last version](https://github.com/rcspam/audio2ascii/releases/download/v2.0.1/v2.1-macosx.tar.gz).
+   Download [last version](https://github.com/rcspam/audio2ascii/releases/download/v2.0.2/Audio2ascii-2.0.2-MacOSX.tar.gz).
 Decompress it where you want and launch **'install_Unix.sh'** from the decompress directory in a terminal,
 or open archive and copy all files in **'/Users/\<username\>/Library/Application Support/INRIA/Natron/Plugins'**.
 
 * Windows
 
-   Download [last version](https://github.com/rcspam/audio2ascii/releases/download/v2.0.1/v2.1-win.zip).
-   Open archive and copy all files in **'C:\Users\\\<username\>\\Local Settings\Application Data\INRIA\Natron\Plugins'**
-
+   Download [last version](https://github.com/rcspam/audio2ascii/releases/download/v2.0.2/Audio2ascii-2.0.2-Setup.exe).
+   
 <u>Install some extras (Optional)</u>
 
  * If you want add a menu command to the Natron menu-bar, add the following lines in the init.py of your home Natron plugin directory (create it if doesn't exist):
