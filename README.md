@@ -49,9 +49,7 @@ def audioToAscii():
     os.system("$HOME/.local/share/INRIA/Natron/Plugins/audio2ascii/audio2ascii.sh -g &")
 NatronGui.natron.addMenuCommand("Ext-Tools/AudioToAscii","audioToAscii",QtCore.Qt.Key.Key_L,QtCore.Qt.KeyboardModifier.ShiftModifier)
 ```
-
  * Linux users can run audio2ascii.sh as standalone to create ascii curves (yad must be installed)
-
 ```
 $ your/path/to/audio2ascii.sh -g
 ```
