@@ -45,14 +45,7 @@ or open archive and copy all files in **'/Users/\<username\>/Library/Application
 # Linux
 import os
 def audioToAscii():
-    os.system("$HOME/.local/share/INRIA/Natron/Plugins/audio2ascii.sh -g &")
-NatronGui.natron.addMenuCommand("Ext-Tools/AudioToAscii","audioToAscii",QtCore.Qt.Key.Key_L,QtCore.Qt.KeyboardModifier.ShiftModifier)
-```
-```
-# OSX
-import os
-def audioToAscii():
-    os.system("$HOME/Library/Application\ Support/INRIA/Natron/Plugins/audio2ascii.sh -g &")
+    os.system("$HOME/.local/share/INRIA/Natron/Plugins/audio2ascii/audio2ascii.sh -g &")
 NatronGui.natron.addMenuCommand("Ext-Tools/AudioToAscii","audioToAscii",QtCore.Qt.Key.Key_L,QtCore.Qt.KeyboardModifier.ShiftModifier)
 ```
 
