@@ -40,7 +40,8 @@ or open archive and copy all files in **'/Users/\<username\>/Library/Application
    
 <u>Install some extras (Optional)</u>
 
- * If you want add a menu command to the Natron menu-bar, add the following lines in the init.py of your home Natron plugin directory (create it if doesn't exist):
+ * If you want add a standalone audio2ascii.sh in a Ext-Tools menu to the Natron menu-bar, add the following lines in the init.py of your home Natron plugin directory (create it if doesn't exist):
+![selection_002](https://cloud.githubusercontent.com/assets/10021906/10450176/d88f01dc-7198-11e5-9d31-4b147a8df998.png)
 ```
 # Linux
 import os
