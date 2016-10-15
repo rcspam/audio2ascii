@@ -1,8 +1,17 @@
+#ATTENTION:
+**Does'nt work anymore since Natron 2.0. I have no time to see what is wrong, apparently just some changes in the natron pyplug API. It could be easy enough to make it work again. So fork it.**
+
+**rcspam**
+
+
 # audio2ascii
    ![frame](https://cloud.githubusercontent.com/assets/10021906/8899999/50eb0540-343b-11e5-9d9b-63ceb5a540b6.png)
 
  ![screenshot-2](https://cloud.githubusercontent.com/assets/10021906/8778111/35a9be00-2efc-11e5-828a-4fed9d3d266d.png)
 
+
+          
+ 
  Natron2.0 python plugin to animate you parameters with waveform from an audio file(mp3, wav,aiff,...).
   It can do a basic preview audio while viewer playing (only OSX and Linux for now), this can be usefull [until a sound support](https://github.com/MrKepzie/Natron/issues/76#issuecomment-120059396) in future Natron versions (>2.0).
 
