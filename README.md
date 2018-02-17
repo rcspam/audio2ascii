@@ -67,9 +67,9 @@ $ your/path/to/audio2ascii.sh -g
 
 Some short videos released with the [Natron 2 Snapshot](http://sourceforge.net/projects/natron/files/snapshots/) Transform Node:
 
-* [Test1.mp4](https://dl.dropboxusercontent.com/u/2677320/test1.mp4) ( x curve on scale)
-* [Test2.mp4](https://dl.dropboxusercontent.com/u/2677320/test2.mp4) ( xy curves (stereo) with x translate on left channel,  y translate on right channel )
-* [Test3.mp4](https://dl.dropboxusercontent.com/u/2677320/test3.mp4) (y curve on y translate)
+* [Test1.mp4](https://www.dropbox.com/s/tgs9276g9pjd2dt/test1.mp4?dl=0) ( x curve on scale)
+* [Test2.mp4](https://www.dropbox.com/s/ssrli8y7v5bq0ns/test2.mp4?dl=0) ( xy curves (stereo) with x translate on left channel,  y translate on right channel )
+* [Test3.mp4](https://www.dropbox.com/s/9xja7747m1hlvf2/test3.mp4?dl=0) (y curve on y translate)
 * [Tuto/Demo](https://www.youtube.com/watch?v=koagSOPnsVw) (animate a rotopaint point on music)
 
  
